@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>404 — Page Not Found | CleanMails</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { DEFAULT: '#dc2626' },
+        ink: { DEFAULT: '#0f172a', muted: '#64748b', faint: '#94a3b8' },
+        canvas: { DEFAULT: '#fafafa', deep: '#e2e8f0' }
+      },
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      }
+    }
+  }
+}
+</script>
+<style>
+body { background: #fafafa; }
+@keyframes glitch1 { 0%, 100% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 2px); } 25% { clip-path: inset(92% 0 1% 0); transform: translate(2px, -1px); } 50% { clip-path: inset(43% 0 1% 0); transform: translate(-1px, 3px); } 75% { clip-path: inset(25% 0 58% 0); transform: translate(1px, -2px); } }
+@keyframes glitch2 { 0%, 100% { clip-path: inset(25% 0 58% 0); transform: translate(2px, -1px); } 25% { clip-path: inset(40% 0 61% 0); transform: translate(-1px, 2px); } 50% { clip-path: inset(92% 0 1% 0); transform: translate(1px, -3px); } 75% { clip-path: inset(43% 0 1% 0); transform: translate(-2px, 1px); } }
+.glitch { position: relative; }
+.glitch::before, .glitch::after { content: '404'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.glitch::before { color: #dc2626; animation: glitch1 2.5s infinite linear; opacity: 0.7; }
+.glitch::after { color: #3b82f6; animation: glitch2 2.5s infinite linear; opacity: 0.5; }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
+.float { animation: float 4s ease-in-out infinite; }
+</style>
+</head>
+<body class="font-sans text-ink antialiased min-h-screen flex flex-col items-center justify-center px-6">
+
+<div class="text-center max-w-lg">
+<!-- Glitch 404 -->
+<div class="mb-8 float">
+<h1 class="glitch font-serif text-[140px] md:text-[180px] font-bold text-ink leading-none tracking-tighter select-none">404</h1>
+</div>
+
+<!-- Message -->
+<h2 class="font-serif text-2xl md:text-3xl font-bold text-ink tracking-tight mb-3">This page doesn't exist.</h2>
+<p class="text-ink-muted mb-8 leading-relaxed">The email might be valid, but this URL isn't. Let's get you back on track.</p>
+
+<!-- Fake terminal -->
+<div class="bg-[#0f172a] rounded-2xl p-5 mb-8 text-left shadow-xl">
+<div class="flex items-center gap-1.5 mb-3">
+<div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+</div>
+<div class="font-mono text-xs text-[#e2e8f0] space-y-1.5">
+<p><span class="text-green-400">$</span> cleanmails verify this-page</p>
+<p class="text-red-400">✗ Status: invalid</p>
+<p class="text-ink-faint">  Reason: Page does not exist (404)</p>
+<p class="text-ink-faint">  Suggestion: <span class="text-amber-300">cleanmails.online</span></p>
+<p class="mt-2"><span class="text-green-400">$</span> <span class="animate-pulse">_</span></p>
+</div>
+</div>
+
+<!-- Actions -->
+<div class="flex flex-col sm:flex-row gap-3 justify-center">
+<a href="index.html" class="px-6 py-3 bg-ink text-white font-semibold rounded-full hover:bg-ink/90 transition-all shadow-lg shadow-ink/10 text-sm">← Back to Home</a>
+<a href="docs.html" class="px-6 py-3 bg-white text-ink font-semibold rounded-full border border-canvas-deep hover:border-ink-faint transition-all text-sm">Read Docs</a>
+</div>
+</div>
+
+<!-- Footer credit -->
+<p class="absolute bottom-8 text-xs text-ink-faint">CleanMails — Email Verification Infrastructure</p>
+
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CleanMails | High-Precision Email Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#edeeef",
+                    "surface": "#f8f9fa",
+                    "on-error-container": "#93000a",
+                    "background": "#f8f9fa",
+                    "primary": "#dc2626",
+                    "surface-dim": "#d9dadb",
+                    "outline-variant": "#e6bdb8",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#ffb4ab",
+                    "on-secondary-fixed": "#141b2b",
+                    "on-tertiary-container": "#f7f8ff",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "tertiary": "#505a69",
+                    "outline": "#916f6b",
+                    "on-primary-container": "#fff6f5",
+                    "secondary-container": "#d9dff5",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-tint": "#bf0715",
+                    "inverse-surface": "#2e3132",
+                    "on-primary-fixed-variant": "#93000b",
+                    "tertiary-container": "#697382",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-variant": "#e1e3e4",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#d9e3f4",
+                    "primary-fixed": "#ffdad6",
+                    "on-surface": "#191c1d",
+                    "on-secondary-fixed-variant": "#404758",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-tertiary-fixed-variant": "#3e4755",
+                    "on-surface-variant": "#5c403c",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#410002",
+                    "surface-container-high": "#e7e8e9",
+                    "on-tertiary-fixed": "#121c28",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "inverse-primary": "#ffb4ab",
+                    "on-background": "#191c1d",
+                    "secondary": "#575e70",
+                    "surface-bright": "#f8f9fa",
+                    "on-secondary-container": "#5c6274",
+                    "primary-container": "#dc2626",
+                    "secondary-fixed": "#dce2f7",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#bdc7d8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "20px",
+                    "base": "4px",
+                    "margin-desktop": "32px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-sm": ["JetBrains Mono"],
+                    "label-md": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9fa;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .technical-border { border: 1px solid #e5e7eb; }
+        .technical-card:hover { border-color: #dc2626; }
+        .ruler-line {
+            height: 1px;
+            background: #e5e7eb;
+            position: relative;
+        }
+        .ruler-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px);
+            background-size: 40px 100%;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm h-14 md:h-16 flex justify-between items-center px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary font-bold" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">CleanMails</span>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#features">Features</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#api">API</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#pricing">Pricing</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#docs">Docs</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="bg-primary text-on-primary px-md md:px-lg py-sm rounded font-label-md cursor-pointer transition-transform duration-200 active:scale-95 text-sm md:text-base">
+        Get Started
+    </button>
+<button id="mobile-menu-btn" class="md:hidden material-symbols-outlined text-on-surface p-xs">menu</button>
+</div>
+</header>
+<!-- Mobile Navigation Drawer -->
+<div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+<div class="absolute inset-0 bg-on-surface/50 backdrop-blur-sm" id="mobile-menu-overlay"></div>
+<nav class="absolute top-0 right-0 h-full w-64 bg-surface shadow-xl p-lg flex flex-col gap-lg pt-16">
+<button id="mobile-menu-close" class="absolute top-md right-md material-symbols-outlined text-on-surface">close</button>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors text-lg" href="#features">Features</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors text-lg" href="#api">API</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors text-lg" href="#pricing">Pricing</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors text-lg" href="#docs">Docs</a>
+</nav>
+</div>
+<main class="pt-20 md:pt-32">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop text-center mb-xl">
+<div class="inline-flex items-center gap-xs px-sm py-xs bg-surface-container-high border border-outline-variant rounded mb-lg">
+<span class="font-label-sm text-primary uppercase">Version 2.4.0-Stable</span>
+<span class="w-1 h-1 bg-outline rounded-full"></span>
+<span class="font-label-sm text-tertiary">Go 1.22 Runtime</span>
+</div>
+<h1 class="font-display-lg text-[32px] sm:text-[44px] md:text-[56px] lg:text-[72px] leading-[1.1] text-on-surface mb-md tracking-tight">
+            High-Precision Email Verification, <br class="hidden sm:block"/>
+<span class="text-primary">Self-Hosted.</span>
+</h1>
+<p class="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] leading-relaxed text-tertiary max-w-3xl mx-auto mb-lg">
+            The complete infrastructure for deliverability, security, and automation. Secure your sender reputation with surgical precision.
+        </p>
+<div class="flex flex-col md:flex-row gap-md justify-center items-center">
+<button class="w-full md:w-auto bg-primary text-on-primary px-xl py-md rounded-lg font-label-md flex items-center justify-center gap-sm transition-all hover:brightness-110">
+                Get Started <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full md:w-auto border border-outline text-on-surface px-xl py-md rounded-lg font-label-md hover:bg-surface-container transition-all">
+                Read the Docs
+            </button>
+</div>
+</section>
+<!-- Video Section -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl">
+<div class="relative aspect-video bg-surface-container-highest rounded-xl overflow-hidden border border-outline-variant/30 shadow-2xl group cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/20 to-transparent"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-14 h-14 md:w-20 md:h-20 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
+<span class="material-symbols-outlined text-[28px] md:text-[40px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-sm left-sm md:bottom-lg md:left-lg">
+<div class="flex items-center gap-sm bg-surface/80 backdrop-blur-md px-md py-sm rounded border border-outline-variant">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+<span class="font-label-sm uppercase tracking-wider">Platform Walkthrough: v2.4.0</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Ruler -->
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl">
+<div class="ruler-line"></div>
+</div>
+<!-- Enterprise-Grade Reliability Section -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl" id="features">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg">Enterprise-Grade Reliability</h2>
+<p class="text-tertiary mt-sm">Infrastructure built for the most demanding email operations.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<span class="material-symbols-outlined text-primary mb-md">public</span>
+<h4 class="font-headline-md text-headline-md mb-sm">Global Scalability</h4>
+<p class="font-body-md text-tertiary">High-throughput processing engine capable of validating millions of emails with sub-second latency.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<span class="material-symbols-outlined text-primary mb-md">shield</span>
+<h4 class="font-headline-md text-headline-md mb-sm">Data Privacy</h4>
+<p class="font-body-md text-tertiary">Total control over your data. Keep sensitive information within your own secure infrastructure.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<span class="material-symbols-outlined text-primary mb-md">gavel</span>
+<h4 class="font-headline-md text-headline-md mb-sm">Compliance Ready</h4>
+<p class="font-body-md text-tertiary">Built-in audit logs and granular role-based access control (RBAC) to meet enterprise security standards.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<span class="material-symbols-outlined text-primary mb-md">hub</span>
+<h4 class="font-headline-md text-headline-md mb-sm">Seamless Integration</h4>
+<p class="font-body-md text-tertiary">Connect effortlessly with HubSpot, Salesforce, and Zapier via native webhooks and SDKs.</p>
+</div>
+</div>
+</section>
+<!-- Technical Bento Grid Modules (Inserted from SCREEN_9) -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl" id="technical-details">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- 1. Email Verification Engine -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between technical-card transition-all">
+<div>
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<h3 class="font-headline-md text-headline-md">Email Verification Engine</h3>
+</div>
+<p class="font-body-md text-tertiary mb-md">Multi-layer validation system including SMTP deep-checks, catch-all detection, disposable provider filtering, and syntax validation.</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-sm">
+<div class="p-sm bg-surface rounded border border-outline-variant font-label-sm">SMTP Handshake</div>
+<div class="p-sm bg-surface rounded border border-outline-variant font-label-sm">Catch-all Detection</div>
+<div class="p-sm bg-surface rounded border border-outline-variant font-label-sm">MX Record Lookup</div>
+<div class="p-sm bg-surface rounded border border-outline-variant font-label-sm">Disposable Check</div>
+<div class="p-sm bg-surface rounded border border-outline-variant font-label-sm">DNS Validation</div>
+</div>
+</div>
+</div>
+<!-- 13. Infrastructure (Stack) -->
+<div class="md:col-span-4 bg-surface border border-outline-variant rounded-xl p-lg flex flex-col technical-card transition-all">
+<span class="font-label-sm text-primary mb-sm">STACK v2.4</span>
+<h3 class="font-headline-md text-headline-md mb-md">Infrastructure</h3>
+<ul class="space-y-sm flex-grow">
+<li class="flex items-center gap-sm font-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">dns</span> PostgreSQL 16
+                    </li>
+<li class="flex items-center gap-sm font-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">speed</span> Redis 7
+                    </li>
+<li class="flex items-center gap-sm font-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">terminal</span> Go 1.22
+                    </li>
+<li class="flex items-center gap-sm font-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">box</span> Docker / K8s Ready
+                    </li>
+</ul>
+</div>
+<!-- 2. REST API Section -->
+<div class="md:col-span-12 lg:col-span-6 bg-inverse-surface text-on-primary-container border border-outline rounded-xl p-lg overflow-hidden technical-card transition-all" id="api">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-white">REST API v1</h3>
+<p class="text-tertiary-fixed font-body-md mt-sm">Enterprise-grade endpoints with JWT &amp; Signing Secrets.</p>
+</div>
+<span class="bg-primary-container px-sm py-xs text-white rounded font-label-sm">JSON RPC</span>
+</div>
+<div class="code-block p-md rounded-lg text-[13px] leading-relaxed overflow-x-auto border border-outline-variant">
+<span class="text-green-400">POST</span> /api/v1/verify<br/>
+                    {<br/>
+                      <span class="text-blue-300">"email"</span>: "dev@cleanmails.io",<br/>
+                      <span class="text-blue-300">"timeout"</span>: 5000,<br/>
+                      <span class="text-blue-300">"smtp_check"</span>: true<br/>
+                    }<br/>
+<br/>
+<span class="text-gray-500">// Response</span><br/>
+                    {<br/>
+                      <span class="text-blue-300">"status"</span>: "valid",<br/>
+                      <span class="text-blue-300">"score"</span>: 0.98<br/>
+                    }
+                </div>
+</div>
+<!-- 3. Authentication & 4. Rate Limiting -->
+<div class="md:col-span-12 lg:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<div class="material-symbols-outlined text-primary mb-md">lock</div>
+<h4 class="font-headline-md text-headline-md mb-sm">Auth &amp; Security</h4>
+<p class="font-body-md text-tertiary">RBAC, bcrypt hashing, and strict CSP headers for ultimate data protection.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<div class="material-symbols-outlined text-primary mb-md">timer_10_alt_1</div>
+<h4 class="font-headline-md text-headline-md mb-sm">Rate Limiting</h4>
+<p class="font-body-md text-tertiary">Sliding window algorithms to prevent abuse while ensuring high throughput.</p>
+</div>
+</div>
+<!-- 7. Automation & 8. Integrations -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<h3 class="font-headline-md text-headline-md mb-md">Automation</h3>
+<ul class="space-y-sm">
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary text-[18px]">done</span> Triggers</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary text-[18px]">done</span> Conditions</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary text-[18px]">done</span> Custom Actions</li>
+</ul>
+</div>
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-md text-headline-md">Native Integrations</h3>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-[10px] font-bold">Z</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-[10px] font-bold">H</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-[10px] font-bold">S</div>
+</div>
+</div>
+<p class="font-body-md text-tertiary mb-lg">Connect seamlessly with HubSpot, Salesforce, Zapier, and your existing CRM stack.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-md">
+<div class="flex items-center gap-sm text-tertiary font-label-sm uppercase tracking-wider"><span class="w-2 h-2 bg-primary rounded-full"></span> Webhooks</div>
+<div class="flex items-center gap-sm text-tertiary font-label-sm uppercase tracking-wider"><span class="w-2 h-2 bg-primary rounded-full"></span> SDKs</div>
+<div class="flex items-center gap-sm text-tertiary font-label-sm uppercase tracking-wider"><span class="w-2 h-2 bg-primary rounded-full"></span> MCP</div>
+<div class="flex items-center gap-sm text-tertiary font-label-sm uppercase tracking-wider"><span class="w-2 h-2 bg-primary rounded-full"></span> API</div>
+</div>
+</div>
+<!-- 10. MCP Server & 11. Worker -->
+<div class="md:col-span-6 bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<h3 class="font-headline-md text-headline-md mb-sm">AI-Ready MCP Server</h3>
+<p class="font-body-md text-tertiary">Integrate verification tools directly into LLM workflows. Enable AI agents to validate leads in real-time.</p>
+</div>
+<div class="md:col-span-6 bg-surface-container-low border border-outline-variant rounded-xl p-lg technical-card transition-all">
+<h3 class="font-headline-md text-headline-md mb-sm">Background Worker</h3>
+<p class="font-body-md text-tertiary">Industrial-strength task processing with graceful shutdown support (SIGINT/SIGTERM) and dead-letter queues.</p>
+</div>
+</div>
+</section>
+<!-- ROI Calculator -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl">
+<div class="bg-on-surface text-surface border border-outline rounded-xl p-md md:p-xl">
+<div class="max-w-2xl">
+<h2 class="font-headline-lg text-headline-lg mb-md">Deliverability ROI Calculator</h2>
+<p class="text-tertiary-fixed mb-xl">Calculate annual savings by eliminating hard bounces and protecting sender reputation.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg md:gap-xl">
+<div>
+<label class="block font-label-sm text-surface-variant mb-sm">MONTHLY EMAIL VOLUME</label>
+<input class="w-full accent-primary bg-surface-container" max="1000000" min="1000" step="1000" type="range" value="50000"/>
+<div class="flex justify-between mt-sm font-label-md">
+<span>1k</span>
+<span>50k</span>
+<span>1M</span>
+</div>
+</div>
+<div class="flex flex-col justify-center text-center md:border-l border-outline-variant/20 md:px-lg pt-md md:pt-0">
+<span class="font-label-sm text-surface-variant uppercase mb-xs">ESTIMATED BOUNCE REDUCTION</span>
+<span class="font-headline-md text-headline-md text-primary">~99.4%</span>
+</div>
+<div class="flex flex-col justify-center text-center md:border-l border-outline-variant/20 md:px-lg pt-md md:pt-0">
+<span class="font-label-sm text-surface-variant uppercase mb-xs">ANNUAL COST SAVINGS</span>
+<span class="font-headline-md text-headline-md text-white">$12,480.00</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl" id="pricing">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg">Tiered Licensing</h2>
+<p class="text-tertiary mt-sm">Scalable plans precision-engineered for every growth stage.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Solo -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:shadow-lg transition-all">
+<h4 class="font-headline-md text-headline-md">Solo</h4>
+<p class="text-tertiary font-body-md mb-md">For independent devs.</p>
+<div class="text-primary font-headline-md mb-lg">$49<span class="text-sm font-normal text-on-surface-variant">/mo</span></div>
+<ul class="space-y-sm mb-xl flex-grow">
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> 10k Checks</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> API Access</li>
+<li class="flex items-center gap-sm text-sm text-tertiary"><span class="material-symbols-outlined text-[16px]">cancel</span> No Teams</li>
+</ul>
+<button class="w-full border border-outline py-sm rounded font-label-md hover:bg-surface-container transition-all">Select Plan</button>
+</div>
+<!-- Team -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:shadow-lg transition-all ring-1 ring-primary">
+<div class="bg-primary text-white text-[10px] uppercase font-bold px-sm py-1 rounded-full self-start mb-sm">Most Popular</div>
+<h4 class="font-headline-md text-headline-md">Team</h4>
+<p class="text-tertiary font-body-md mb-md">Small squads.</p>
+<div class="text-primary font-headline-md mb-lg">$149<span class="text-sm font-normal text-on-surface-variant">/mo</span></div>
+<ul class="space-y-sm mb-xl flex-grow">
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> 50k Checks</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> Team Management</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> Webhooks</li>
+</ul>
+<button class="w-full bg-primary text-white py-sm rounded font-label-md hover:brightness-110 transition-all">Select Plan</button>
+</div>
+<!-- Business -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:shadow-lg transition-all">
+<h4 class="font-headline-md text-headline-md">Business</h4>
+<p class="text-tertiary font-body-md mb-md">Scaling agencies.</p>
+<div class="text-primary font-headline-md mb-lg">$449<span class="text-sm font-normal text-on-surface-variant">/mo</span></div>
+<ul class="space-y-sm mb-xl flex-grow">
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> 250k Checks</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> Audit Logs</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> White-label</li>
+</ul>
+<button class="w-full border border-outline py-sm rounded font-label-md hover:bg-surface-container transition-all">Select Plan</button>
+</div>
+<!-- Enterprise -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:shadow-lg transition-all">
+<h4 class="font-headline-md text-headline-md">Enterprise</h4>
+<p class="text-tertiary font-body-md mb-md">High volume.</p>
+<div class="text-primary font-headline-md mb-lg">Custom</div>
+<ul class="space-y-sm mb-xl flex-grow">
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> Unlimited</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> 24/7 SLA</li>
+<li class="flex items-center gap-sm text-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span> Dedicated Node</li>
+</ul>
+<button class="w-full border border-outline py-sm rounded font-label-md hover:bg-surface-container transition-all">Contact Sales</button>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-xl" id="faq">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg">Frequently Asked Questions</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="p-lg bg-surface border border-outline-variant rounded-xl">
+<h5 class="font-headline-md text-[20px] mb-sm">Why choose self-hosted over an API?</h5>
+<p class="font-body-md text-tertiary">Complete control over data privacy, zero latency for internal apps, and no recurring per-email costs. You own the infrastructure.</p>
+</div>
+<div class="p-lg bg-surface border border-outline-variant rounded-xl">
+<h5 class="font-headline-md text-[20px] mb-sm">Is it difficult to set up?</h5>
+<p class="font-body-md text-tertiary">Not at all. Our Docker-based deployment allows you to get a production-ready instance running in under 5 minutes.</p>
+</div>
+<div class="p-lg bg-surface border border-outline-variant rounded-xl">
+<h5 class="font-headline-md text-[20px] mb-sm">How accurate is the verification?</h5>
+<p class="font-body-md text-tertiary">We maintain 99.9% accuracy using an 8-step deep check process including SMTP handshakes and real-time DNS validation.</p>
+</div>
+<div class="p-lg bg-surface border border-outline-variant rounded-xl">
+<h5 class="font-headline-md text-[20px] mb-sm">Do you support custom integrations?</h5>
+<p class="font-body-md text-tertiary">Yes. Beyond our native connectors, you can build custom workflows using our flexible webhooks and automation engine.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-surface-container-low border-t border-outline-variant py-xl">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-gutter px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<div class="col-span-1 sm:col-span-2">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary font-bold">terminal</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">CleanMails</span>
+</div>
+<p class="font-body-md text-on-surface-variant max-w-xs mb-lg">
+                High-precision email verification infrastructure. Engineered for speed, security, and surgical accuracy.
+            </p>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-tertiary hover:text-primary transition-colors cursor-pointer">share</span>
+<span class="material-symbols-outlined text-tertiary hover:text-primary transition-colors cursor-pointer">hub</span>
+<span class="material-symbols-outlined text-tertiary hover:text-primary transition-colors cursor-pointer">code</span>
+</div>
+</div>
+<div>
+<h5 class="font-label-md font-bold mb-md uppercase tracking-widest text-primary">Product</h5>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Features</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">API Docs</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Self-Hosted</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md font-bold mb-md uppercase tracking-widest text-primary">Company</h5>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">About</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Blog</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Careers</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md font-bold mb-md uppercase tracking-widest text-primary">Resources</h5>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Support</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Community</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="#">Status</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md font-bold mb-md uppercase tracking-widest text-primary">Legal</h5>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="privacy.html">Privacy</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="terms.html">Terms</a></li>
+<li><a class="font-body-md text-on-surface-variant hover:text-primary underline-offset-4 hover:underline" href="delivery.html">Delivery & Refund</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mt-xl pt-lg border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-md">
+<span class="font-body-md text-on-surface-variant">© 2024 CleanMails. Precision Engineered.</span>
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 bg-green-500 rounded-full"></span>
+<span class="font-label-sm text-tertiary">All Systems Operational</span>
+</div>
+</div>
+</footer>
+<script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+    function openMobileMenu() { mobileMenu.classList.remove('hidden'); }
+    function closeMobileMenu() { mobileMenu.classList.add('hidden'); }
+
+    mobileMenuBtn.addEventListener('click', openMobileMenu);
+    mobileMenuClose.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+    // Close menu on nav link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
+    // Micro-interactions and effects
+    document.querySelectorAll('.technical-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.classList.add('shadow-md');
+        });
+        card.addEventListener('mouseleave', () => {
+            card.classList.remove('shadow-md');
+        });
+    });
+
+    // Simple Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+</script>
+</body></html>

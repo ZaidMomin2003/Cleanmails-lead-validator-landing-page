@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CleanMails — Documentation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { DEFAULT: '#dc2626', light: '#fef2f2', dark: '#991b1b' },
+        ink: { DEFAULT: '#0f172a', light: '#334155', muted: '#64748b', faint: '#94a3b8' },
+        canvas: { DEFAULT: '#fafafa', alt: '#f1f5f9', deep: '#e2e8f0' },
+        code: { bg: '#0f172a', text: '#e2e8f0' }
+      },
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      }
+    }
+  }
+}
+</script>
+<style>
+html { scroll-behavior: smooth; }
+body { background: #fafafa; }
+.code-block { background: #0f172a; border-radius: 12px; padding: 1.25rem 1.5rem; overflow-x: auto; }
+.code-block code { color: #e2e8f0; font-size: 13px; line-height: 1.8; }
+.doc-section { scroll-margin-top: 5rem; }
+</style>
+</head>
+<body class="font-sans text-ink antialiased">
+
+<!-- Nav -->
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-canvas-deep/50">
+<div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-2">
+<div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1">mail</span>
+</div>
+<span class="font-serif font-bold text-xl text-ink tracking-tight">CleanMails</span>
+<span class="text-xs font-mono text-ink-faint ml-2 px-2 py-0.5 bg-canvas-alt rounded border border-canvas-deep">Docs</span>
+</a>
+<a href="index.html" class="text-sm text-ink-muted hover:text-ink transition-colors">← Back to Home</a>
+</div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-5 md:px-8 py-12 flex gap-12">
+<!-- Sidebar -->
+<aside class="hidden lg:block w-56 flex-shrink-0">
+<div class="sticky top-24 space-y-1">
+<p class="text-[10px] font-mono text-ink-faint uppercase tracking-widest mb-3">Getting Started</p>
+<a href="#installation" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Installation</a>
+<a href="#configuration" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Configuration</a>
+<a href="#first-verify" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">First Verification</a>
+<p class="text-[10px] font-mono text-ink-faint uppercase tracking-widest mb-3 mt-6">Features</p>
+<a href="#single-verify" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Single Verify</a>
+<a href="#bulk-verify" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Bulk Upload</a>
+<a href="#verification-checks" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Verification Checks</a>
+<a href="#catch-all" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Catch-All Detection</a>
+<p class="text-[10px] font-mono text-ink-faint uppercase tracking-widest mb-3 mt-6">Developer</p>
+<a href="#api" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">REST API</a>
+<a href="#mcp" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">MCP Server</a>
+<a href="#webhooks" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Webhooks</a>
+<a href="#integrations" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Integrations</a>
+<a href="#automation" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Automation Rules</a>
+<p class="text-[10px] font-mono text-ink-faint uppercase tracking-widest mb-3 mt-6">Admin</p>
+<a href="#seats" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Seats & Users</a>
+<a href="#safety" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">IP Safety</a>
+<a href="#updates" class="block text-sm text-ink-muted hover:text-ink py-1 pl-3 border-l-2 border-transparent hover:border-brand transition-colors">Updates</a>
+</div>
+</aside>
+
+<!-- Main content -->
+<main class="flex-1 max-w-3xl">
+<h1 class="font-serif text-4xl font-bold text-ink tracking-tight mb-4">Documentation</h1>
+<p class="text-lg text-ink-muted mb-12">Complete guide to installing, configuring, and using CleanMails.</p>
+
+<!-- INSTALLATION -->
+<section id="installation" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Installation</h2>
+<p class="text-ink-muted mb-4">CleanMails installs on any Linux VPS with a single command. Requirements: Ubuntu 22.04+, 1GB RAM, port 25 open for SMTP verification.</p>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Quick Install</h3>
+<p class="text-sm text-ink-muted mb-3">After purchasing, you'll receive a license key. Run this on your VPS:</p>
+<div class="code-block mb-4">
+<code><span class="text-green-400">$</span> curl -sSL https://install.cleanmails.online/setup.sh | bash -s -- --key=CM_LIVE_xxxxxxxxxxxx</code>
+</div>
+<p class="text-sm text-ink-muted mb-4">The installer will:</p>
+<ul class="space-y-2 text-sm text-ink-light mb-6">
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Validate your license key</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Install Docker + Docker Compose (if not present)</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Set up PostgreSQL 16 + Redis 7</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Deploy the CleanMails application</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Configure Nginx with your domain</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Auto-provision SSL via Let's Encrypt</li>
+<li class="flex items-start gap-2"><span class="text-brand mt-0.5">→</span> Create your admin account</li>
+</ul>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Manual Install (Docker Compose)</h3>
+<div class="code-block mb-4">
+<code><span class="text-green-400">$</span> git clone https://github.com/cleanmails/cleanmails.git
+<span class="text-green-400">$</span> cd cleanmails
+<span class="text-green-400">$</span> cp .env.example .env
+<span class="text-green-400">$</span> <span class="text-ink-faint"># Edit .env with your settings</span>
+<span class="text-green-400">$</span> docker compose up -d</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">VPS Requirements</h3>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl p-5">
+<div class="grid grid-cols-2 gap-4 text-sm">
+<div><span class="text-ink-faint">OS:</span> <span class="text-ink">Ubuntu 22.04+ / Debian 12+</span></div>
+<div><span class="text-ink-faint">RAM:</span> <span class="text-ink">1GB min, 2GB recommended</span></div>
+<div><span class="text-ink-faint">CPU:</span> <span class="text-ink">1 core min, 2 recommended</span></div>
+<div><span class="text-ink-faint">Disk:</span> <span class="text-ink">20GB SSD</span></div>
+<div><span class="text-ink-faint">Ports:</span> <span class="text-ink">80, 443, 25 (SMTP)</span></div>
+<div><span class="text-ink-faint">Cost:</span> <span class="text-ink">~$5–10/month VPS</span></div>
+</div>
+</div>
+</section>
+
+<!-- CONFIGURATION -->
+<section id="configuration" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Configuration</h2>
+<p class="text-ink-muted mb-4">All settings are managed via environment variables in the <code class="text-xs bg-canvas-alt px-1.5 py-0.5 rounded border border-canvas-deep font-mono">.env</code> file.</p>
+
+<div class="code-block mb-4">
+<code><span class="text-green-400">PORT</span>=8080
+<span class="text-green-400">DATABASE_URL</span>=postgres://cleanmails:password@localhost:5432/cleanmails?sslmode=disable
+<span class="text-green-400">REDIS_URL</span>=redis://localhost:6379
+<span class="text-green-400">JWT_SECRET</span>=your-random-64-char-secret
+<span class="text-green-400">ENVIRONMENT</span>=production
+<span class="text-green-400">ALLOWED_ORIGIN</span>=https://yourdomain.com
+<span class="text-green-400">DODO_API_KEY</span>=your-dodo-api-key
+<span class="text-green-400">DODO_PRODUCT_ID</span>=your-product-id</code>
+</div>
+
+<div class="bg-brand-light border border-brand/10 rounded-xl p-4 text-sm text-brand-dark">
+<strong>Important:</strong> In production, <code>JWT_SECRET</code> must be a strong random string. The server will refuse to start if it detects a weak secret.
+</div>
+</section>
+
+<!-- FIRST VERIFY -->
+<section id="first-verify" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">First Verification</h2>
+<p class="text-ink-muted mb-4">After installation, open your domain in a browser. Log in with the admin credentials you created during setup.</p>
+<ol class="space-y-3 text-sm text-ink-light mb-6">
+<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span> Navigate to the <strong>Verify</strong> tab</li>
+<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">2</span> Enter an email address (e.g. <code class="font-mono text-xs">test@gmail.com</code>)</li>
+<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">3</span> Click <strong>Verify</strong> — results appear in under 2 seconds</li>
+</ol>
+</section>
+
+<!-- SINGLE VERIFY -->
+<section id="single-verify" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Single Email Verification</h2>
+<p class="text-ink-muted mb-4">Verify individual emails through the dashboard or API. Choose verification depth:</p>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl overflow-hidden mb-4">
+<table class="w-full text-sm">
+<thead><tr class="border-b border-canvas-deep"><th class="px-5 py-3 text-left text-xs font-mono text-ink-faint uppercase">Depth</th><th class="px-5 py-3 text-left text-xs font-mono text-ink-faint uppercase">Checks Performed</th><th class="px-5 py-3 text-left text-xs font-mono text-ink-faint uppercase">Speed</th></tr></thead>
+<tbody>
+<tr class="border-b border-canvas-deep"><td class="px-5 py-3 font-mono text-xs text-brand">syntax</td><td class="px-5 py-3 text-ink-light">Format validation, disposable, role, free domain, typo suggestion</td><td class="px-5 py-3 text-ink-faint">&lt;1ms</td></tr>
+<tr class="border-b border-canvas-deep"><td class="px-5 py-3 font-mono text-xs text-brand">mx</td><td class="px-5 py-3 text-ink-light">All syntax checks + DNS MX record lookup</td><td class="px-5 py-3 text-ink-faint">~50ms</td></tr>
+<tr><td class="px-5 py-3 font-mono text-xs text-brand">full</td><td class="px-5 py-3 text-ink-light">All MX checks + SMTP handshake + catch-all detection</td><td class="px-5 py-3 text-ink-faint">1-8s</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- BULK VERIFY -->
+<section id="bulk-verify" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Bulk Upload</h2>
+<p class="text-ink-muted mb-4">Upload CSV files with up to 100,000 emails. CleanMails uses a two-pass verification system:</p>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Pass 1 — Fast Elimination</h3>
+<p class="text-sm text-ink-muted mb-3">Runs instantly on all emails. Removes obvious invalids:</p>
+<ul class="space-y-1.5 text-sm text-ink-light mb-6">
+<li>• Invalid syntax (bad format)</li>
+<li>• Disposable domains (123,000+ in database)</li>
+<li>• Domains with no MX records</li>
+</ul>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Pass 2 — SMTP Verification</h3>
+<p class="text-sm text-ink-muted mb-3">Only runs on emails that survived Pass 1. Groups by domain for efficiency:</p>
+<ul class="space-y-1.5 text-sm text-ink-light mb-6">
+<li>• Connects to mail server via port 25</li>
+<li>• Sends EHLO, MAIL FROM commands</li>
+<li>• Tests for catch-all (triple-probe)</li>
+<li>• Verifies each email with RCPT TO</li>
+</ul>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">CSV Handling</h3>
+<p class="text-sm text-ink-muted mb-4">CleanMails preserves all original columns. It auto-detects the email column and appends two new columns to the output:</p>
+<div class="code-block mb-4">
+<code><span class="text-ink-faint"># Input CSV</span>
+name,email,company
+John,john@gmail.com,Acme
+
+<span class="text-ink-faint"># Output CSV (original columns preserved + 2 new)</span>
+name,email,company,<span class="text-green-400">cm_status</span>,<span class="text-green-400">cm_reason</span>
+John,john@gmail.com,Acme,valid,Mailbox confirmed via SMTP</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Filtered Downloads</h3>
+<p class="text-sm text-ink-muted mb-3">Download specific subsets of your results:</p>
+<div class="code-block">
+<code>GET /api/v1/lists/:id/download<span class="text-green-400">?filter=all</span>     <span class="text-ink-faint"># All emails</span>
+GET /api/v1/lists/:id/download<span class="text-green-400">?filter=valid</span>   <span class="text-ink-faint"># Only good emails</span>
+GET /api/v1/lists/:id/download<span class="text-green-400">?filter=invalid</span> <span class="text-ink-faint"># Only bad emails</span>
+GET /api/v1/lists/:id/download<span class="text-green-400">?filter=risky</span>   <span class="text-ink-faint"># Disposable/catch-all</span></code>
+</div>
+</section>
+
+<!-- VERIFICATION CHECKS -->
+<section id="verification-checks" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Verification Checks</h2>
+<p class="text-ink-muted mb-4">CleanMails performs 8 distinct checks on every email:</p>
+<div class="space-y-3">
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">spellcheck</span><div><p class="text-sm font-semibold text-ink">Syntax Validation</p><p class="text-xs text-ink-muted">RFC-compliant regex check. Catches typos like missing @, double dots, invalid characters.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">dns</span><div><p class="text-sm font-semibold text-ink">MX Record Lookup</p><p class="text-xs text-ink-muted">Verifies the domain has mail exchange records configured. No MX = can't receive email.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">handshake</span><div><p class="text-sm font-semibold text-ink">SMTP Handshake</p><p class="text-xs text-ink-muted">Full protocol conversation: EHLO → MAIL FROM → RCPT TO. Confirms the mailbox exists at the server level.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">delete_forever</span><div><p class="text-sm font-semibold text-ink">Disposable Detection</p><p class="text-xs text-ink-muted">123,000+ throwaway domains (Mailinator, Guerrillamail, etc.). Updated daily from open-source feeds.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">select_all</span><div><p class="text-sm font-semibold text-ink">Catch-All Detection</p><p class="text-xs text-ink-muted">Triple-probe algorithm sends 3 fake addresses. If 2+ accepted, domain is catch-all — individual verification unreliable.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">badge</span><div><p class="text-sm font-semibold text-ink">Role Account Detection</p><p class="text-xs text-ink-muted">890+ patterns: admin@, info@, support@, noreply@. These are shared inboxes, not personal addresses.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">language</span><div><p class="text-sm font-semibold text-ink">Free Domain Detection</p><p class="text-xs text-ink-muted">4,400+ providers: Gmail, Yahoo, Hotmail, Outlook. Flags personal vs business addresses.</p></div></div>
+<div class="bg-white border border-canvas-deep rounded-xl p-4 flex items-start gap-3"><span class="material-symbols-outlined text-brand text-lg mt-0.5">lightbulb</span><div><p class="text-sm font-semibold text-ink">Typo Suggestion</p><p class="text-xs text-ink-muted">Levenshtein distance matching: gmial.com → gmail.com, yaho.com → yahoo.com.</p></div></div>
+</div>
+</section>
+
+<!-- CATCH-ALL -->
+<section id="catch-all" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Smart Catch-All Detection</h2>
+<p class="text-ink-muted mb-4">A catch-all domain accepts emails to any address — making individual RCPT TO verification unreliable. CleanMails uses a triple-probe approach for accuracy:</p>
+<div class="code-block mb-4">
+<code><span class="text-ink-faint"># CleanMails sends 3 guaranteed-fake addresses:</span>
+RCPT TO: cm_probe_1719238471_a@domain.com  → <span class="text-green-400">250 OK</span>
+RCPT TO: cm_verify_1719238472_x@domain.com → <span class="text-green-400">250 OK</span>
+RCPT TO: zz__nonexist_99182@domain.com     → <span class="text-green-400">250 OK</span>
+
+<span class="text-ink-faint"># 2+ accepted = catch-all confirmed</span>
+<span class="text-ink-faint"># All emails on this domain marked as "unknown (catch-all)"</span>
+<span class="text-ink-faint"># No further RCPT TO attempts — saves connections</span></code>
+</div>
+<p class="text-sm text-ink-muted">Results are cached per domain. If you have 5,000 emails on a catch-all domain, only 3 probe requests are made — not 5,000.</p>
+</section>
+
+<!-- REST API -->
+<section id="api" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">REST API</h2>
+<p class="text-ink-muted mb-4">Full API access with JWT or API key authentication. All endpoints return JSON.</p>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Authentication</h3>
+<div class="code-block mb-4">
+<code><span class="text-ink-faint"># Option 1: JWT Bearer token</span>
+Authorization: Bearer eyJhbGciOiJIUzI1NiI...
+
+<span class="text-ink-faint"># Option 2: API Key</span>
+X-API-Key: cm_live_k8x92mf4nz71pq3a</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Verify Single Email</h3>
+<div class="code-block mb-4">
+<code><span class="text-amber-300">POST</span> /api/v1/verify/single
+
+{
+  "email": "user@company.com",
+  "depth": "full"  <span class="text-ink-faint">// "syntax" | "mx" | "full"</span>
+}
+
+<span class="text-ink-faint">// Response</span>
+{
+  "id": "uuid",
+  "email": "user@company.com",
+  "status": "valid",
+  "score": 95,
+  "result": {
+    "reachable": "yes",
+    "syntax": { "valid": true, "username": "user", "domain": "company.com" },
+    "smtp": { "host_exists": true, "deliverable": true, "catch_all": false },
+    "disposable": false,
+    "role_account": false,
+    "free": false,
+    "has_mx_records": true,
+    "suggestion": ""
+  }
+}</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Upload Bulk CSV</h3>
+<div class="code-block mb-4">
+<code><span class="text-amber-300">POST</span> /api/v1/lists/upload
+Content-Type: multipart/form-data
+
+<span class="text-ink-faint">// Form fields:</span>
+file: contacts.csv
+name: "Q2 Marketing Leads"</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">All Endpoints</h3>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl overflow-hidden">
+<table class="w-full text-xs">
+<thead><tr class="border-b border-canvas-deep"><th class="px-4 py-2.5 text-left font-mono text-ink-faint">Method</th><th class="px-4 py-2.5 text-left font-mono text-ink-faint">Endpoint</th><th class="px-4 py-2.5 text-left font-mono text-ink-faint">Description</th></tr></thead>
+<tbody class="divide-y divide-canvas-deep">
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/auth/login</td><td class="px-4 py-2 text-ink-muted">Login, get JWT</td></tr>
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/verify/single</td><td class="px-4 py-2 text-ink-muted">Verify one email</td></tr>
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/lists/upload</td><td class="px-4 py-2 text-ink-muted">Upload CSV</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/lists</td><td class="px-4 py-2 text-ink-muted">List all uploads</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/lists/:id</td><td class="px-4 py-2 text-ink-muted">Get progress</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/lists/:id/download</td><td class="px-4 py-2 text-ink-muted">Download CSV</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/api-keys</td><td class="px-4 py-2 text-ink-muted">List API keys</td></tr>
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/api-keys</td><td class="px-4 py-2 text-ink-muted">Create API key</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/webhooks</td><td class="px-4 py-2 text-ink-muted">List webhooks</td></tr>
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/webhooks</td><td class="px-4 py-2 text-ink-muted">Create webhook</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/seats</td><td class="px-4 py-2 text-ink-muted">List users</td></tr>
+<tr><td class="px-4 py-2 text-green-600 font-mono">POST</td><td class="px-4 py-2 font-mono text-ink">/seats</td><td class="px-4 py-2 text-ink-muted">Create user seat</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/license</td><td class="px-4 py-2 text-ink-muted">License status</td></tr>
+<tr><td class="px-4 py-2 text-blue-600 font-mono">GET</td><td class="px-4 py-2 font-mono text-ink">/health/ip</td><td class="px-4 py-2 text-ink-muted">IP blacklist status</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- MCP SERVER -->
+<section id="mcp" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">MCP Server</h2>
+<p class="text-ink-muted mb-4">CleanMails includes a Model Context Protocol server. AI agents (Claude, Cursor, Kiro) can verify emails through natural language.</p>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Setup</h3>
+<p class="text-sm text-ink-muted mb-3">Add to your IDE's <code class="text-xs bg-canvas-alt px-1.5 py-0.5 rounded border border-canvas-deep font-mono">mcp.json</code>:</p>
+<div class="code-block mb-4">
+<code>{
+  "mcpServers": {
+    "cleanmails": {
+      "command": "cleanmails-mcp",
+      "args": ["--api-url", "http://localhost:8080"],
+      "env": { "CLEANMAILS_API_KEY": "cm_live_..." }
+    }
+  }
+}</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Available Tools</h3>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl overflow-hidden">
+<table class="w-full text-xs">
+<thead><tr class="border-b border-canvas-deep"><th class="px-4 py-2.5 text-left font-mono text-ink-faint">Tool</th><th class="px-4 py-2.5 text-left text-ink-faint">Input</th><th class="px-4 py-2.5 text-left text-ink-faint">Description</th></tr></thead>
+<tbody class="divide-y divide-canvas-deep">
+<tr><td class="px-4 py-2 font-mono text-brand">verify_email</td><td class="px-4 py-2 text-ink-muted">email, depth</td><td class="px-4 py-2 text-ink-light">Full verification with score</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">verify_bulk</td><td class="px-4 py-2 text-ink-muted">emails[]</td><td class="px-4 py-2 text-ink-light">Batch verify array</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">check_domain</td><td class="px-4 py-2 text-ink-muted">domain</td><td class="px-4 py-2 text-ink-light">MX, disposable, free check</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">is_disposable</td><td class="px-4 py-2 text-ink-muted">domain</td><td class="px-4 py-2 text-ink-light">Check against 123K+ list</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">is_role_account</td><td class="px-4 py-2 text-ink-muted">username</td><td class="px-4 py-2 text-ink-light">Check 890+ patterns</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">suggest_domain</td><td class="px-4 py-2 text-ink-muted">domain</td><td class="px-4 py-2 text-ink-light">Typo correction</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">get_verification_stats</td><td class="px-4 py-2 text-ink-muted">—</td><td class="px-4 py-2 text-ink-light">Summary counts</td></tr>
+<tr><td class="px-4 py-2 font-mono text-brand">get_list_status</td><td class="px-4 py-2 text-ink-muted">list_id</td><td class="px-4 py-2 text-ink-light">Bulk list progress</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- WEBHOOKS -->
+<section id="webhooks" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Webhooks</h2>
+<p class="text-ink-muted mb-4">Receive HTTP notifications when events occur. Configure endpoints from the Developer page or via API.</p>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Events</h3>
+<ul class="space-y-2 text-sm text-ink-light mb-6">
+<li><code class="font-mono text-xs text-brand">verification.completed</code> — Single email verified</li>
+<li><code class="font-mono text-xs text-brand">list.completed</code> — Bulk list processing finished</li>
+<li><code class="font-mono text-xs text-brand">email.risky</code> — Disposable or catch-all detected</li>
+</ul>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Payload Format</h3>
+<div class="code-block mb-4">
+<code><span class="text-ink-faint">// POST to your webhook URL</span>
+{
+  "event": "verification.completed",
+  "timestamp": "2025-06-17T10:30:00Z",
+  "data": {
+    "email": "user@company.com",
+    "status": "valid",
+    "score": 95,
+    "reason": "Mailbox confirmed via SMTP"
+  }
+}
+
+<span class="text-ink-faint">// Auth header included:</span>
+X-CleanMails-Signature: sha256=abc123...</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Connecting to n8n</h3>
+<p class="text-sm text-ink-muted mb-3">In n8n, create a Webhook node with these settings:</p>
+<div class="code-block">
+<code>URL: https://yourdomain.com/api/v1/webhooks/incoming
+Method: POST
+Authentication: Header Auth
+Header Name: X-API-Key
+Header Value: cm_live_xxxx</code>
+</div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section id="integrations" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Integrations</h2>
+<p class="text-ink-muted mb-4">Connect CleanMails to your existing tools through native integrations.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">HubSpot</h4>
+<p class="text-xs text-ink-muted">Sync contacts → verify → update custom property with verification status. Connect via OAuth2 in the Integrations page.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">Zapier</h4>
+<p class="text-xs text-ink-muted">Triggers: verification.completed, list.completed. Actions: verify email, upload list. Auth via API key.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">n8n</h4>
+<p class="text-xs text-ink-muted">Self-hosted workflow automation. Use the HTTP Request node with X-API-Key header to call any CleanMails endpoint.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">Make (Integromat)</h4>
+<p class="text-xs text-ink-muted">Use the HTTP module. Set URL to your API endpoint, auth header to X-API-Key, and parse JSON response.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">Mailchimp</h4>
+<p class="text-xs text-ink-muted">Export your Mailchimp audience as CSV → upload to CleanMails → download clean list → re-import.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5">
+<h4 class="text-sm font-semibold text-ink mb-1">Custom HTTP</h4>
+<p class="text-xs text-ink-muted">Push results to any REST endpoint. Configure URL, auth method, and which events to send via the Webhooks page.</p>
+</div>
+</div>
+</section>
+
+<!-- AUTOMATION -->
+<section id="automation" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Automation Rules</h2>
+<p class="text-ink-muted mb-4">Set up rules that automatically process verification results. Rules fire on every verification.</p>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Rule Structure</h3>
+<div class="code-block mb-4">
+<code><span class="text-ink-faint">// Rule: reject disposable emails</span>
+{
+  "trigger": "on_verification",
+  "conditions": [
+    { "field": "result.disposable", "operator": "is_true" }
+  ],
+  "actions": [
+    { "type": "reject" },
+    { "type": "webhook_fire", "params": { "webhook_id": "wh-123" } }
+  ]
+}</code>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Available Triggers</h3>
+<ul class="space-y-1.5 text-sm text-ink-light mb-4">
+<li><code class="font-mono text-xs text-brand">on_verification</code> — fires after each email is verified</li>
+<li><code class="font-mono text-xs text-brand">on_list_complete</code> — fires when a bulk list finishes</li>
+</ul>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Available Actions</h3>
+<ul class="space-y-1.5 text-sm text-ink-light">
+<li><code class="font-mono text-xs">reject</code> — mark email as rejected</li>
+<li><code class="font-mono text-xs">tag_email</code> — add a custom tag</li>
+<li><code class="font-mono text-xs">webhook_fire</code> — trigger a specific webhook</li>
+<li><code class="font-mono text-xs">move_to_list</code> — move to a different list</li>
+</ul>
+</section>
+
+<!-- SEATS -->
+<section id="seats" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Seats & Users</h2>
+<p class="text-ink-muted mb-4">Create additional user accounts for team members. Each seat gets independent login credentials and access to the dashboard.</p>
+<div class="code-block mb-4">
+<code><span class="text-amber-300">POST</span> /api/v1/seats
+{
+  "name": "Sarah Miller",
+  "username": "sarah",
+  "password": "securepass123"
+}</code>
+</div>
+<p class="text-sm text-ink-muted">Users created via seats can log in, upload lists, verify emails, and view analytics. Admin can remove seats at any time.</p>
+</section>
+
+<!-- IP SAFETY -->
+<section id="safety" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">IP Safety & Rate Limiting</h2>
+<p class="text-ink-muted mb-4">CleanMails includes built-in protection to prevent your server IP from being blacklisted during SMTP verification.</p>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Default Safety Limits</h3>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl p-5 mb-4">
+<div class="grid grid-cols-2 gap-3 text-sm">
+<div><span class="text-ink-faint">Max concurrent connections:</span> <span class="text-ink font-mono">3</span></div>
+<div><span class="text-ink-faint">Per domain per hour:</span> <span class="text-ink font-mono">2</span></div>
+<div><span class="text-ink-faint">RCPT TO delay:</span> <span class="text-ink font-mono">200ms + jitter</span></div>
+<div><span class="text-ink-faint">Emails per connection:</span> <span class="text-ink font-mono">10 max</span></div>
+<div><span class="text-ink-faint">Error cooldown:</span> <span class="text-ink font-mono">5 minutes</span></div>
+<div><span class="text-ink-faint">Daily SMTP limit:</span> <span class="text-ink font-mono">5,000</span></div>
+</div>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-6 mb-3">Warm-Up Schedule</h3>
+<p class="text-sm text-ink-muted mb-3">On fresh IPs, CleanMails ramps up gradually:</p>
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl p-5">
+<div class="grid grid-cols-7 gap-2 text-center text-xs">
+<div><div class="font-mono text-ink font-semibold">50</div><div class="text-ink-faint">Day 1</div></div>
+<div><div class="font-mono text-ink font-semibold">100</div><div class="text-ink-faint">Day 2</div></div>
+<div><div class="font-mono text-ink font-semibold">200</div><div class="text-ink-faint">Day 3</div></div>
+<div><div class="font-mono text-ink font-semibold">500</div><div class="text-ink-faint">Day 4</div></div>
+<div><div class="font-mono text-ink font-semibold">1K</div><div class="text-ink-faint">Day 5</div></div>
+<div><div class="font-mono text-ink font-semibold">2K</div><div class="text-ink-faint">Day 6</div></div>
+<div><div class="font-mono text-ink font-semibold">5K</div><div class="text-ink-faint">Day 7+</div></div>
+</div>
+</div>
+
+<h3 class="text-base font-semibold text-ink mt-8 mb-3">Blacklist Monitoring</h3>
+<p class="text-sm text-ink-muted">CleanMails checks your IP against 5 major blacklists (Spamhaus, Barracuda, SpamCop, SORBS, UCEPROTECT) every 60 minutes. If listed, SMTP verification pauses automatically and a notification appears in the dashboard.</p>
+</section>
+
+<!-- UPDATES -->
+<section id="updates" class="doc-section mb-16">
+<h2 class="font-serif text-2xl font-bold text-ink mb-4">Updates</h2>
+<p class="text-ink-muted mb-4">CleanMails includes lifetime updates. Pull the latest version with one command:</p>
+<div class="code-block mb-4">
+<code><span class="text-green-400">$</span> cleanmails update</code>
+</div>
+<p class="text-sm text-ink-muted mb-4">Other management commands:</p>
+<div class="code-block">
+<code><span class="text-green-400">$</span> cleanmails status    <span class="text-ink-faint"># Check service health</span>
+<span class="text-green-400">$</span> cleanmails logs      <span class="text-ink-faint"># View application logs</span>
+<span class="text-green-400">$</span> cleanmails backup    <span class="text-ink-faint"># Database backup to /opt/cleanmails/backups/</span>
+<span class="text-green-400">$</span> cleanmails restart   <span class="text-ink-faint"># Restart all services</span></code>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

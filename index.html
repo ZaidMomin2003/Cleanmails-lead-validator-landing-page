@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CleanMails — Email Verification Infrastructure</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23dc2626'/%3E%3Cpath d='M6 11l10 7 10-7' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M6 11v10a2 2 0 002 2h16a2 2 0 002-2V11' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='24' cy='9' r='4' fill='%2322c55e'/%3E%3Cpath d='M22.5 9l1 1 2-2' stroke='white' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { DEFAULT: '#dc2626', light: '#fef2f2', dark: '#991b1b', muted: '#f87171' },
+        ink: { DEFAULT: '#0f172a', light: '#334155', muted: '#64748b', faint: '#94a3b8' },
+        canvas: { DEFAULT: '#fafafa', alt: '#f1f5f9', deep: '#e2e8f0' },
+        code: { bg: '#0f172a', text: '#e2e8f0' }
+      },
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      },
+      spacing: { '18': '4.5rem', '22': '5.5rem', '30': '7.5rem' },
+      letterSpacing: { 'tightest': '-0.04em' }
+    }
+  }
+}
+</script>
+<style>
+html { scroll-behavior: smooth; }
+body { background: #fafafa; }
+.hero-gradient { background: linear-gradient(180deg, #fafafa 0%, #f1f5f9 100%); }
+.glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.bento-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.bento-card:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.08); }
+.code-line { position: relative; padding-left: 2.5rem; }
+.code-line::before { content: attr(data-line); position: absolute; left: 0; color: #475569; font-size: 12px; width: 1.5rem; text-align: right; }
+.stat-ring { background: conic-gradient(#dc2626 0% 99.4%, #e2e8f0 99.4% 100%); }
+.fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; background: #e2e8f0; border-radius: 2px; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #dc2626; cursor: pointer; box-shadow: 0 2px 8px rgba(220,38,38,0.3); }
+.faq-item { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; padding-top: 0; padding-bottom: 0; }
+.faq-item.open { max-height: 300px; padding-bottom: 1.25rem; }
+/* Human-feel details: asymmetric grain texture, custom selection, scroll indicator */
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 9999; }
+::selection { background: rgba(220, 38, 38, 0.12); color: inherit; }
+.nav-active { position: relative; }
+.nav-active::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #dc2626; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.float-slow { animation: float 6s ease-in-out infinite; }
+.float-med { animation: float 4.5s ease-in-out infinite 0.5s; }
+@keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+.strip-scroll-left { animation: scrollLeft 25s linear infinite; width: max-content; }
+.strip-scroll-right { animation: scrollRight 25s linear infinite; width: max-content; }
+.strip-scroll-left:hover, .strip-scroll-right:hover { animation-play-state: paused; }
+</style>
+</head>
+<body class="font-sans text-ink antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 glass border-b border-canvas-deep/50">
+<div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+<a href="#" class="flex items-center gap-2">
+<div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1">mail</span>
+</div>
+<span class="font-serif font-bold text-xl text-ink tracking-tight">CleanMails</span>
+</a>
+<div class="hidden md:flex items-center gap-8">
+<a href="#features" class="text-sm text-ink-muted hover:text-ink transition-colors">Features</a>
+<a href="#pricing" class="text-sm text-ink-muted hover:text-ink transition-colors">Pricing</a>
+<a href="#faq" class="text-sm text-ink-muted hover:text-ink transition-colors">FAQ</a>
+</div>
+<div class="flex items-center gap-3">
+<a href="#pricing" class="hidden sm:inline-flex px-5 py-2.5 bg-ink text-white text-sm font-medium rounded-full hover:bg-ink-light transition-colors">Get Started</a>
+<button id="nav-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-canvas-alt transition-colors">
+<span class="material-symbols-outlined text-ink">menu</span>
+</button>
+</div>
+</div>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobile-nav" class="fixed inset-0 z-[60] hidden">
+<div class="absolute inset-0 bg-ink/40 backdrop-blur-sm" id="mobile-overlay"></div>
+<div class="absolute right-0 top-0 h-full w-72 bg-white p-8 flex flex-col gap-6 pt-20 shadow-2xl">
+<button id="mobile-close" class="absolute top-5 right-5 material-symbols-outlined text-ink-muted">close</button>
+<a href="#features" class="text-lg font-serif text-ink hover:text-brand transition-colors mobile-link">Features</a>
+<a href="#pricing" class="text-lg font-serif text-ink hover:text-brand transition-colors mobile-link">Pricing</a>
+<a href="#faq" class="text-lg font-serif text-ink hover:text-brand transition-colors mobile-link">FAQ</a>
+<a href="#pricing" class="mt-4 px-5 py-3 bg-brand text-white text-center font-medium rounded-full mobile-link">Get Started</a>
+</div>
+</div>
+
+<!-- Hero -->
+<section class="hero-gradient pt-32 md:pt-40 pb-16 md:pb-24">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="max-w-4xl mx-auto text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-light border border-brand/10 rounded-full mb-8">
+<span class="w-1.5 h-1.5 bg-brand rounded-full animate-pulse"></span>
+<span class="text-xs font-medium text-brand">Self-hosted · Your data never leaves your server</span>
+</div>
+
+<h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-ink leading-[1.12] tracking-tightest mb-6">
+Self-Hosted Email Verification.<br/><span class="text-brand">Unlimited. One Command Install.</span>
+</h1>
+
+<p class="text-lg md:text-xl text-ink-muted max-w-2xl mx-auto leading-relaxed mb-10">
+Verify unlimited emails on your own server — no per-email costs, ever. One-click install, full data privacy, and your information never leaves your infrastructure.
+</p>
+
+<!-- Video embed right after description -->
+<div class="max-w-3xl mx-auto mb-12">
+<div class="relative aspect-video bg-code-bg rounded-2xl overflow-hidden shadow-2xl shadow-ink/10 group cursor-pointer border border-canvas-deep/50">
+<div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6 right-6 space-y-2 opacity-30">
+<div class="h-3 bg-white/10 rounded w-3/4"></div>
+<div class="h-3 bg-white/10 rounded w-1/2"></div>
+<div class="h-3 bg-white/10 rounded w-2/3"></div>
+<div class="h-3 bg-white/10 rounded w-1/3"></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-brand text-3xl md:text-4xl ml-1" style="font-variation-settings:'FILL' 1">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+<span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span>
+<span class="text-white/90 text-xs font-mono">2:34 — How CleanMails Works</span>
+</div>
+</div>
+</div>
+
+<!-- Real data showcase (stats) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-12">
+<div class="bg-white border border-canvas-deep rounded-2xl p-5 text-center bento-card">
+<div class="font-serif text-3xl font-bold text-ink tracking-tight">123K+</div>
+<div class="text-xs text-ink-muted mt-1">Disposable domains blocked</div>
+<div class="text-[10px] text-ink-faint mt-0.5">Auto-updated daily from open sources</div>
+</div>
+<div class="bg-white border border-canvas-deep rounded-2xl p-5 text-center bento-card">
+<div class="font-serif text-3xl font-bold text-ink tracking-tight">4,400+</div>
+<div class="text-xs text-ink-muted mt-1">Free email providers detected</div>
+<div class="text-[10px] text-ink-faint mt-0.5">Gmail, Yahoo, Outlook & more</div>
+</div>
+<div class="bg-white border border-canvas-deep rounded-2xl p-5 text-center bento-card">
+<div class="font-serif text-3xl font-bold text-ink tracking-tight">890+</div>
+<div class="text-xs text-ink-muted mt-1">Role accounts flagged</div>
+<div class="text-[10px] text-ink-faint mt-0.5">admin@, info@, support@ etc.</div>
+</div>
+</div>
+
+<!-- CTA below stats -->
+<div class="flex flex-col sm:flex-row gap-3 justify-center">
+<a href="#pricing" class="px-8 py-3.5 bg-brand text-white font-medium rounded-full hover:bg-brand-dark transition-all shadow-lg shadow-brand/20 text-center">Get CleanMails — $109</a>
+<a href="#features" class="px-8 py-3.5 bg-white text-ink font-medium rounded-full border border-canvas-deep hover:border-ink-faint transition-all text-center">See How It Works</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Integrations -->
+<section class="py-16 md:py-24 bg-canvas-alt overflow-hidden">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="text-center mb-10">
+<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">Integrations</p>
+<h2 class="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight">Integrate with any CRM, newsletter<br class="hidden md:block"/> platform &amp; MCP connection.</h2>
+<p class="text-ink-muted mt-3 text-base max-w-2xl mx-auto">Handle work seamlessly. Connect with 5,000+ apps via Zapier, n8n, and Make. Use the API in any custom script. More integrations shipping every month.</p>
+</div>
+
+<!-- Scrolling logo strips -->
+<div class="space-y-4 my-12">
+<!-- Strip 1 — scrolls left -->
+<div class="overflow-hidden">
+<div class="strip-scroll-left flex gap-4">
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/hubspot.svg" class="w-7 h-7" alt="HubSpot"/><span class="text-sm font-medium text-ink">HubSpot</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/zapier.svg" class="w-7 h-7" alt="Zapier"/><span class="text-sm font-medium text-ink">Zapier</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/n8n.svg" class="w-7 h-7" alt="n8n"/><span class="text-sm font-medium text-ink">n8n</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/make.svg" class="w-7 h-7" alt="Make"/><span class="text-sm font-medium text-ink">Make</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/mailchimp.svg" class="w-7 h-7" alt="Mailchimp"/><span class="text-sm font-medium text-ink">Mailchimp</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/brevo.svg" class="w-7 h-7" alt="Brevo"/><span class="text-sm font-medium text-ink">Brevo</span></div>
+<!-- Duplicate for seamless loop -->
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/hubspot.svg" class="w-7 h-7" alt="HubSpot"/><span class="text-sm font-medium text-ink">HubSpot</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/zapier.svg" class="w-7 h-7" alt="Zapier"/><span class="text-sm font-medium text-ink">Zapier</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/n8n.svg" class="w-7 h-7" alt="n8n"/><span class="text-sm font-medium text-ink">n8n</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/make.svg" class="w-7 h-7" alt="Make"/><span class="text-sm font-medium text-ink">Make</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/mailchimp.svg" class="w-7 h-7" alt="Mailchimp"/><span class="text-sm font-medium text-ink">Mailchimp</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/brevo.svg" class="w-7 h-7" alt="Brevo"/><span class="text-sm font-medium text-ink">Brevo</span></div>
+</div>
+</div>
+
+<!-- Strip 2 — scrolls right -->
+<div class="overflow-hidden">
+<div class="strip-scroll-right flex gap-4">
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/mailgun.svg" class="w-7 h-7" alt="Mailgun"/><span class="text-sm font-medium text-ink">Mailgun</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/chatgpt.png" class="w-7 h-7 rounded" alt="ChatGPT"/><span class="text-sm font-medium text-ink">ChatGPT</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/anthropic.svg" class="w-7 h-7" alt="Anthropic"/><span class="text-sm font-medium text-ink">Claude</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/resend.svg" class="w-7 h-7" alt="Resend"/><span class="text-sm font-medium text-ink">Resend</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/googlegemini.svg" class="w-7 h-7" alt="Google Gemini"/><span class="text-sm font-medium text-ink">Gemini</span></div>
+<!-- Duplicate for seamless loop -->
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/mailgun.svg" class="w-7 h-7" alt="Mailgun"/><span class="text-sm font-medium text-ink">Mailgun</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/chatgpt.png" class="w-7 h-7 rounded" alt="ChatGPT"/><span class="text-sm font-medium text-ink">ChatGPT</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/anthropic.svg" class="w-7 h-7" alt="Anthropic"/><span class="text-sm font-medium text-ink">Claude</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/resend.svg" class="w-7 h-7" alt="Resend"/><span class="text-sm font-medium text-ink">Resend</span></div>
+<div class="flex-shrink-0 w-40 h-20 bg-white border border-canvas-deep rounded-xl flex items-center justify-center gap-3 shadow-sm"><img src="public/logos/googlegemini.svg" class="w-7 h-7" alt="Google Gemini"/><span class="text-sm font-medium text-ink">Gemini</span></div>
+</div>
+</div>
+</div>
+
+<!-- Info cards below -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-8">
+<div class="bg-white border border-canvas-deep rounded-xl p-5 text-center bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mx-auto mb-3">
+<span class="material-symbols-outlined text-brand text-xl">hub</span>
+</div>
+<h4 class="text-sm font-semibold text-ink mb-1">5,000+ Apps</h4>
+<p class="text-xs text-ink-muted">Zapier, n8n, Make — connect to anything in your workflow.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5 text-center bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mx-auto mb-3">
+<span class="material-symbols-outlined text-brand text-xl">smart_toy</span>
+</div>
+<h4 class="text-sm font-semibold text-ink mb-1">MCP Ready</h4>
+<p class="text-xs text-ink-muted">AI agents verify emails through natural language — zero code.</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-5 text-center bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mx-auto mb-3">
+<span class="material-symbols-outlined text-brand text-xl">code</span>
+</div>
+<h4 class="text-sm font-semibold text-ink mb-1">REST API</h4>
+<p class="text-xs text-ink-muted">Use in any custom script — Python, Node, Go, cURL.</p>
+</div>
+</div>
+
+<!-- More coming badge -->
+<div class="text-center mt-8">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-canvas-deep rounded-full shadow-sm">
+<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+<span class="text-xs font-semibold text-ink">New integrations shipping monthly</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Bento Grid Features -->
+<section id="features" class="py-16 md:py-24">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="text-center mb-14">
+<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">Features</p>
+<h2 class="font-serif text-3xl md:text-5xl font-bold text-ink tracking-tight">Built for developers<br class="hidden md:block"/> who ship fast.</h2>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+<!-- Main: API Code Block -->
+<div class="md:col-span-7 bg-code-bg rounded-2xl p-6 md:p-8 bento-card overflow-hidden">
+<div class="flex items-center justify-between mb-5">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+<div class="w-3 h-3 rounded-full bg-green-400"></div>
+</div>
+<span class="text-xs font-mono text-code-text/50">verify.ts</span>
+</div>
+<div class="font-mono text-sm md:text-[13px] leading-7 text-code-text overflow-x-auto">
+<div class="code-line" data-line="1"><span class="text-purple-400">const</span> result = <span class="text-yellow-300">await</span> cleanmails.<span class="text-blue-300">verify</span>({</div>
+<div class="code-line" data-line="2">  <span class="text-green-300">email</span>: <span class="text-amber-300">"user@company.com"</span>,</div>
+<div class="code-line" data-line="3">  <span class="text-green-300">checks</span>: [<span class="text-amber-300">"smtp"</span>, <span class="text-amber-300">"mx"</span>, <span class="text-amber-300">"disposable"</span>]</div>
+<div class="code-line" data-line="4">});</div>
+<div class="code-line mt-3" data-line="5"><span class="text-gray-500">// Response</span></div>
+<div class="code-line" data-line="6">{</div>
+<div class="code-line" data-line="7">  <span class="text-green-300">status</span>: <span class="text-amber-300">"deliverable"</span>,</div>
+<div class="code-line" data-line="8">  <span class="text-green-300">score</span>: <span class="text-purple-300">0.98</span>,</div>
+<div class="code-line" data-line="9">  <span class="text-green-300">risk</span>: <span class="text-amber-300">"low"</span>,</div>
+<div class="code-line" data-line="10">  <span class="text-green-300">checks_passed</span>: <span class="text-purple-300">8</span>/<span class="text-purple-300">8</span></div>
+<div class="code-line" data-line="11">}</div>
+</div>
+</div>
+
+<!-- Accuracy Ring -->
+<div class="md:col-span-5 bg-white border border-canvas-deep rounded-2xl p-6 md:p-8 bento-card flex flex-col items-center justify-center text-center">
+<div class="relative w-32 h-32 md:w-40 md:h-40 mb-5">
+<div class="stat-ring w-full h-full rounded-full p-2">
+<div class="w-full h-full bg-white rounded-full flex items-center justify-center flex-col">
+<span class="font-serif text-3xl md:text-4xl font-bold text-ink">99.4%</span>
+<span class="text-xs text-ink-faint mt-0.5">bounce reduction</span>
+</div>
+</div>
+</div>
+<h3 class="font-serif text-lg font-semibold text-ink">8-Step Deep Verification</h3>
+<p class="text-sm text-ink-muted mt-1">SMTP, MX, DNS, Disposable, Catch-all, Syntax, Role, Free-mail</p>
+</div>
+
+<!-- SMTP Check -->
+<div class="md:col-span-4 bg-white border border-canvas-deep rounded-2xl p-6 bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-brand text-xl">handshake</span>
+</div>
+<h3 class="font-serif text-lg font-semibold text-ink mb-2">SMTP Handshake</h3>
+<p class="text-sm text-ink-muted leading-relaxed">Real conversation with mail servers. No guessing — we confirm deliverability at the protocol level.</p>
+</div>
+
+<!-- Self-Hosted -->
+<div class="md:col-span-4 bg-white border border-canvas-deep rounded-2xl p-6 bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-brand text-xl">home_storage</span>
+</div>
+<h3 class="font-serif text-lg font-semibold text-ink mb-2">Self-Hosted</h3>
+<p class="text-sm text-ink-muted leading-relaxed">Your data stays on your servers. Zero third-party exposure. Docker deploy in under 5 minutes.</p>
+</div>
+
+<!-- Integrations -->
+<div class="md:col-span-4 bg-white border border-canvas-deep rounded-2xl p-6 bento-card">
+<div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-brand text-xl">hub</span>
+</div>
+<h3 class="font-serif text-lg font-semibold text-ink mb-2">Native Integrations</h3>
+<p class="text-sm text-ink-muted leading-relaxed">HubSpot, Salesforce, Zapier, Webhooks. Plug into your existing stack with zero friction.</p>
+</div>
+
+<!-- Infrastructure -->
+<div class="md:col-span-6 bg-canvas-alt border border-canvas-deep rounded-2xl p-6 md:p-8 bento-card">
+<h3 class="font-serif text-lg font-semibold text-ink mb-4">Infrastructure Stack</h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-canvas-deep">
+<div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><span class="text-blue-600 text-xs font-bold">Go</span></div>
+<div><div class="text-sm font-medium text-ink">Go 1.22</div><div class="text-xs text-ink-faint">Runtime</div></div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-canvas-deep">
+<div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><span class="text-indigo-600 text-xs font-bold">PG</span></div>
+<div><div class="text-sm font-medium text-ink">PostgreSQL</div><div class="text-xs text-ink-faint">Database</div></div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-canvas-deep">
+<div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center"><span class="text-red-600 text-xs font-bold">Re</span></div>
+<div><div class="text-sm font-medium text-ink">Redis 7</div><div class="text-xs text-ink-faint">Cache</div></div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-canvas-deep">
+<div class="w-8 h-8 bg-cyan-50 rounded-lg flex items-center justify-center"><span class="text-cyan-600 text-xs font-bold">K8</span></div>
+<div><div class="text-sm font-medium text-ink">Docker/K8s</div><div class="text-xs text-ink-faint">Deploy</div></div>
+</div>
+</div>
+</div>
+
+<!-- Automation -->
+<div class="md:col-span-6 bg-white border border-canvas-deep rounded-2xl p-6 md:p-8 bento-card">
+<h3 class="font-serif text-lg font-semibold text-ink mb-4">Automation Engine</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-3 bg-canvas-alt rounded-xl">
+<span class="material-symbols-outlined text-brand text-lg">bolt</span>
+<span class="text-sm text-ink">Trigger on list upload → verify → webhook</span>
+</div>
+<div class="flex items-center gap-3 p-3 bg-canvas-alt rounded-xl">
+<span class="material-symbols-outlined text-brand text-lg">schedule</span>
+<span class="text-sm text-ink">Scheduled re-verification (daily/weekly)</span>
+</div>
+<div class="flex items-center gap-3 p-3 bg-canvas-alt rounded-xl">
+<span class="material-symbols-outlined text-brand text-lg">rule</span>
+<span class="text-sm text-ink">Conditional routing by score threshold</span>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- MCP Section -->
+<section class="py-16 md:py-24">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-100 rounded-full mb-6">
+<span class="material-symbols-outlined text-purple-600 text-sm">smart_toy</span>
+<span class="text-xs font-medium text-purple-700">Model Context Protocol</span>
+</div>
+<h2 class="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight mb-4">Let AI agents verify<br/>emails for you.</h2>
+<p class="text-ink-muted leading-relaxed mb-6">CleanMails ships with a built-in MCP server. Connect it to Claude, Cursor, Kiro, or any AI assistant — and let agents verify emails, check domains, and clean lists through natural language.</p>
+<div class="space-y-3">
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="material-symbols-outlined text-green-600 text-[14px]">check</span></div>
+<div><span class="text-sm font-medium text-ink">Zero config</span><span class="text-sm text-ink-muted"> — add 3 lines to mcp.json, done</span></div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="material-symbols-outlined text-green-600 text-[14px]">check</span></div>
+<div><span class="text-sm font-medium text-ink">8 tools exposed</span><span class="text-sm text-ink-muted"> — verify, bulk, domain check, disposable, role, suggest</span></div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="material-symbols-outlined text-green-600 text-[14px]">check</span></div>
+<div><span class="text-sm font-medium text-ink">Runs locally</span><span class="text-sm text-ink-muted"> — stdio transport, no cloud dependency</span></div>
+</div>
+</div>
+</div>
+<div class="bg-code-bg rounded-2xl p-6 shadow-2xl shadow-ink/10 border border-canvas-deep/30">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+<div class="w-3 h-3 rounded-full bg-green-400"></div>
+<span class="text-xs font-mono text-code-text/40 ml-auto">mcp.json</span>
+</div>
+<div class="font-mono text-[12px] leading-6 text-code-text">
+<div><span class="text-gray-500">{</span></div>
+<div class="pl-4"><span class="text-green-300">"mcpServers"</span><span class="text-gray-500">: {</span></div>
+<div class="pl-8"><span class="text-green-300">"cleanmails"</span><span class="text-gray-500">: {</span></div>
+<div class="pl-12"><span class="text-green-300">"command"</span><span class="text-gray-500">:</span> <span class="text-amber-300">"cleanmails-mcp"</span><span class="text-gray-500">,</span></div>
+<div class="pl-12"><span class="text-green-300">"args"</span><span class="text-gray-500">: [</span><span class="text-amber-300">"--api-key"</span><span class="text-gray-500">,</span> <span class="text-amber-300">"cm_..."</span><span class="text-gray-500">]</span></div>
+<div class="pl-8"><span class="text-gray-500">}</span></div>
+<div class="pl-4"><span class="text-gray-500">}</span></div>
+<div><span class="text-gray-500">}</span></div>
+</div>
+<div class="mt-4 pt-4 border-t border-white/10">
+<p class="text-[11px] text-code-text/50 font-mono">That's it. Your AI can now verify emails.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ROI Calculator -->
+<section class="py-16 md:py-24 bg-canvas-alt">
+<div class="max-w-5xl mx-auto px-5 md:px-8">
+<div class="text-center mb-12">
+<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">Calculator</p>
+<h2 class="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight">See your savings.</h2>
+</div>
+
+<div class="bg-code-bg rounded-2xl p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] relative overflow-hidden border border-white/5">
+<div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent"></div>
+<div class="absolute -top-32 -right-32 w-64 h-64 bg-brand/10 rounded-full blur-[80px]"></div>
+<div class="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-600/10 rounded-full blur-[60px]"></div>
+<div class="relative grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+<div>
+<label class="block text-xs font-mono text-white/40 uppercase tracking-wider mb-4">Monthly Email Volume</label>
+<input id="volume-slider" type="range" min="1000" max="1000000" step="1000" value="100000" class="w-full mb-3"/>
+<div class="flex justify-between text-xs text-white/40 font-mono">
+<span>1K</span>
+<span id="volume-display" class="text-brand font-semibold text-sm">100K</span>
+<span>1M</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="text-center p-5 bg-white/5 rounded-xl border border-white/10">
+<div class="font-serif text-2xl md:text-3xl font-bold text-brand" id="bounce-reduction">99.4%</div>
+<div class="text-xs text-white/40 mt-1">Bounce Reduction</div>
+</div>
+<div class="text-center p-5 bg-white/5 rounded-xl border border-white/10">
+<div class="font-serif text-2xl md:text-3xl font-bold text-white" id="savings-display">$24,960</div>
+<div class="text-xs text-white/40 mt-1">Annual Savings</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="py-16 md:py-24">
+<div class="max-w-5xl mx-auto px-5 md:px-8">
+<div class="text-center mb-14">
+<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">Pricing</p>
+<h2 class="font-serif text-3xl md:text-5xl font-bold text-ink tracking-tight">One price. Everything included.</h2>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-3xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.07)]">
+<div class="grid grid-cols-1 md:grid-cols-5">
+<!-- Left: Price + CTA -->
+<div class="md:col-span-2 p-8 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-canvas-deep bg-canvas-alt/50">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-wider rounded-full mb-5 w-fit border border-brand/15">
+<span class="w-1.5 h-1.5 bg-brand rounded-full animate-pulse"></span>
+Launch Price
+</div>
+<div class="flex items-end gap-2 mb-2">
+<span class="font-serif text-6xl font-bold text-ink tracking-tight leading-none">$109</span>
+<span class="text-ink-faint text-sm line-through pb-1.5">$199</span>
+</div>
+<p class="text-sm text-ink-muted mb-6 leading-relaxed">One-time payment. Self-host on your server. Verify unlimited emails forever. No recurring fees.</p>
+<a href="#" class="block w-full py-3.5 bg-ink text-white text-center font-semibold rounded-full hover:bg-ink-light transition-all shadow-lg shadow-ink/10 text-[14px] mb-3">Get CleanMails →</a>
+<div class="flex items-center justify-center gap-4">
+<span class="text-[10px] text-ink-faint">All sales final</span>
+<span class="text-canvas-deep">·</span>
+<span class="text-[10px] text-ink-faint">Instant access</span>
+<span class="text-canvas-deep">·</span>
+<span class="text-[10px] text-ink-faint">Free updates</span>
+</div>
+</div>
+
+<!-- Right: Features -->
+<div class="md:col-span-3 p-8 md:p-10">
+<p class="text-xs font-mono text-ink-faint uppercase tracking-widest mb-5">Everything Included</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Full SMTP verification</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Bulk CSV upload (100K+)</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Smart catch-all detection</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">123K+ disposable domains</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">React dashboard + analytics</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">REST API + API keys</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">MCP server (AI agents)</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">HubSpot, Zapier, n8n, Make</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Webhooks & automation rules</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Multi-user seats</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Docker one-command deploy</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-brand text-[18px]">check_circle</span>
+<span class="text-sm text-ink">Lifetime updates included</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-16 md:py-24 bg-canvas-alt">
+<div class="max-w-3xl mx-auto px-5 md:px-8">
+<div class="text-center mb-14">
+<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">FAQ</p>
+<h2 class="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight">Common questions.</h2>
+</div>
+
+<div class="space-y-3" id="faq-container">
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">What is CleanMails and how does it work?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">CleanMails is a self-hosted email verification tool. You install it on your own VPS, upload email lists or use the API, and it performs 8-step deep verification — syntax, MX, DNS, SMTP handshake, catch-all, disposable, role-based, and free-mail detection. Your data never leaves your server.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">How fast is the installation?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">One command. Run the install script with your license key and you're live in under 3 minutes. It auto-installs Docker, PostgreSQL, Redis, sets up SSL, and creates your admin account — no manual configuration needed.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">Is there a limit on how many emails I can verify?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">No limits at all. Once you purchase CleanMails, you can verify unlimited emails — single, bulk CSV (100K+ at a time), or via API. There are no per-email costs and no monthly quotas. It runs on your hardware, so you scale as much as your server allows.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">What VPS/server do I need to run it?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">Any Linux VPS with 1GB RAM, 1 CPU core, and port 25 open for SMTP checks. Ubuntu 22.04+ or Debian 12+ recommended. A $5–10/month VPS from providers like Hetzner, DigitalOcean, or Contabo works perfectly.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">What integrations are supported?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">Native integrations: HubSpot, Mailchimp, Brevo, Mailgun, and Resend. Automation platforms: Zapier, n8n, and Make (connecting you to 5,000+ apps). AI/MCP: works with Claude, ChatGPT, Gemini, Cursor, and Kiro. Plus a full REST API, webhooks, and TypeScript/Python SDKs for custom scripts.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">How accurate is the verification?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">99.4% bounce reduction using real SMTP handshakes — not just DNS lookups. We verify the mailbox actually exists at the server level. Plus catch-all detection with a triple-probe algorithm, and a database of 123,000+ disposable domains updated daily.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">Is my data safe? Do you store emails I verify?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">CleanMails runs entirely on YOUR server. We have zero access to your data — no cloud sync, no telemetry, no third-party calls. Email lists stay in your PostgreSQL database and nowhere else. You own 100% of your data.</p>
+</div>
+</div>
+
+<div class="bg-white border border-canvas-deep rounded-xl overflow-hidden">
+<button class="faq-toggle w-full flex items-center justify-between p-5 text-left">
+<span class="font-serif text-base font-semibold text-ink pr-4">Do I get updates after purchase?</span>
+<span class="material-symbols-outlined text-ink-faint transition-transform duration-300 faq-icon">expand_more</span>
+</button>
+<div class="faq-item px-5">
+<p class="text-sm text-ink-muted leading-relaxed">Yes — lifetime updates are included with your one-time purchase. New features, security patches, disposable domain list updates, and integration additions are all pushed automatically. No recurring fees, no upgrade charges.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-ink text-white py-16">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+<div class="lg:col-span-2">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1">mail</span>
+</div>
+<span class="font-serif font-bold text-xl">CleanMails</span>
+</div>
+<p class="text-white/50 text-sm max-w-xs leading-relaxed">High-precision email verification. Self-hosted, scalable, and engineered for zero-bounce sending.</p>
+</div>
+<div>
+<h4 class="text-xs font-mono uppercase tracking-widest text-white/40 mb-4">Product</h4>
+<ul class="space-y-2.5">
+<li><a href="#features" class="text-sm text-white/70 hover:text-white transition-colors">Features</a></li>
+<li><a href="#pricing" class="text-sm text-white/70 hover:text-white transition-colors">Pricing</a></li>
+<li><a href="#" class="text-sm text-white/70 hover:text-white transition-colors">API Docs</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-xs font-mono uppercase tracking-widest text-white/40 mb-4">Company</h4>
+<ul class="space-y-2.5">
+<li><a href="#" class="text-sm text-white/70 hover:text-white transition-colors">About</a></li>
+<li><a href="#" class="text-sm text-white/70 hover:text-white transition-colors">Blog</a></li>
+<li><a href="mailto:hello@cleanmails.online" class="text-sm text-white/70 hover:text-white transition-colors">Contact</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-xs font-mono uppercase tracking-widest text-white/40 mb-4">Legal</h4>
+<ul class="space-y-2.5">
+<li><a href="privacy.html" class="text-sm text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
+<li><a href="terms.html" class="text-sm text-white/70 hover:text-white transition-colors">Terms of Service</a></li>
+<li><a href="delivery.html" class="text-sm text-white/70 hover:text-white transition-colors">Delivery Policy</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+<span class="text-white/40 text-sm">© 2024 CleanMails. All rights reserved.</span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-green-400 rounded-full"></span>
+<span class="text-white/50 text-xs font-mono">All Systems Operational</span>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+// Mobile menu
+const navToggle = document.getElementById('nav-toggle');
+const mobileNav = document.getElementById('mobile-nav');
+const mobileOverlay = document.getElementById('mobile-overlay');
+const mobileClose = document.getElementById('mobile-close');
+
+function openNav() { mobileNav.classList.remove('hidden'); }
+function closeNav() { mobileNav.classList.add('hidden'); }
+
+navToggle.addEventListener('click', openNav);
+mobileClose.addEventListener('click', closeNav);
+mobileOverlay.addEventListener('click', closeNav);
+document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', closeNav));
+
+// FAQ accordion
+document.querySelectorAll('.faq-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.nextElementSibling;
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = '');
+    // Open clicked
+    if (!isOpen) {
+      item.classList.add('open');
+      icon.style.transform = 'rotate(180deg)';
+    }
+  });
+});
+
+// ROI Calculator
+const slider = document.getElementById('volume-slider');
+const volumeDisplay = document.getElementById('volume-display');
+const savingsDisplay = document.getElementById('savings-display');
+
+slider.addEventListener('input', () => {
+  const val = parseInt(slider.value);
+  const formatted = val >= 1000000 ? '1M' : val >= 1000 ? Math.round(val/1000) + 'K' : val;
+  volumeDisplay.textContent = formatted;
+  // Savings calc: ~$0.25 per bounced email avoided, assuming 5% bounce rate reduced to 0.03%
+  const bouncesAvoided = val * 0.0497 * 12;
+  const savings = Math.round(bouncesAvoided * 0.25);
+  savingsDisplay.textContent = '$' + savings.toLocaleString();
+});
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
