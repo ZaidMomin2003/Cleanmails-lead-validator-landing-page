@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deploy CleanMails — Setup Your Server</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23dc2626'/%3E%3Cpath d='M6 11l10 7 10-7' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M6 11v10a2 2 0 002 2h16a2 2 0 002-2V11' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='24' cy='9' r='4' fill='%2322c55e'/%3E%3Cpath d='M22.5 9l1 1 2-2' stroke='white' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { DEFAULT: '#dc2626', light: '#fef2f2', dark: '#991b1b', muted: '#f87171' },
+        ink: { DEFAULT: '#0f172a', light: '#334155', muted: '#64748b', faint: '#94a3b8' },
+        canvas: { DEFAULT: '#fafafa', alt: '#f1f5f9', deep: '#e2e8f0' },
+        code: { bg: '#0f172a', text: '#e2e8f0' }
+      },
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      },
+      letterSpacing: { 'tightest': '-0.04em' }
+    }
+  }
+}
+</script>
+<style>
+html { scroll-behavior: smooth; }
+body { background: #fafafa; }
+</style>
+<style>
+.glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 9999; }
+::selection { background: rgba(220, 38, 38, 0.12); color: inherit; }
+.step-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.step-card:hover { box-shadow: 0 20px 40px -12px rgba(0,0,0,0.08); }
+.copy-btn.copied { background: #16a34a !important; }
+.copy-btn.copied .copy-icon { display: none; }
+.copy-btn.copied .check-icon { display: inline; }
+.copy-btn .check-icon { display: none; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.fade-up-d1 { animation-delay: 0.1s; opacity: 0; }
+.fade-up-d2 { animation-delay: 0.2s; opacity: 0; }
+.fade-up-d3 { animation-delay: 0.3s; opacity: 0; }
+.fade-up-d4 { animation-delay: 0.4s; opacity: 0; }
+</style>
+</head>
+<body class="font-sans text-ink antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 glass border-b border-canvas-deep/50">
+<div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-2">
+<div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1">mail</span>
+</div>
+<span class="font-serif font-bold text-xl text-ink tracking-tight">CleanMails</span>
+</a>
+<div class="flex items-center gap-3">
+<a href="index.html" class="text-sm text-ink-muted hover:text-ink transition-colors">← Back to Home</a>
+<a href="mailto:hello@cleanmails.online" class="hidden sm:inline-flex px-4 py-2 text-sm text-ink-muted hover:text-ink border border-canvas-deep rounded-full transition-colors">Need Help?</a>
+</div>
+</div>
+</nav>
+
+<!-- Hero -->
+<section class="pt-28 md:pt-36 pb-10 md:pb-14">
+<div class="max-w-4xl mx-auto px-5 md:px-8 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full mb-6 fade-up">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+<span class="text-xs font-semibold text-green-700">Payment confirmed — you're in!</span>
+</div>
+<h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-ink leading-[1.12] tracking-tightest mb-4 fade-up fade-up-d1">
+Deploy CleanMails<br/>on your server.
+</h1>
+<p class="text-lg text-ink-muted max-w-xl mx-auto leading-relaxed fade-up fade-up-d2">
+3 steps. 3 minutes. Your own email verification infrastructure — live and ready.
+</p>
+</div>
+</section>
+
+<!-- Video Section -->
+<section class="pb-14 md:pb-20">
+<div class="max-w-3xl mx-auto px-5 md:px-8 fade-up fade-up-d3">
+<div class="relative aspect-video bg-code-bg rounded-2xl overflow-hidden shadow-2xl shadow-ink/10 border border-canvas-deep/50 group cursor-pointer" id="video-container">
+<div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6 right-6 space-y-2.5 opacity-20">
+<div class="h-3 bg-white/10 rounded w-3/4"></div>
+<div class="h-3 bg-white/10 rounded w-1/2"></div>
+<div class="h-3 bg-white/10 rounded w-2/3"></div>
+<div class="h-3 bg-white/10 rounded w-2/5"></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center" id="video-play-btn">
+<div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-brand text-3xl md:text-4xl ml-1" style="font-variation-settings:'FILL' 1">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+<span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span>
+<span class="text-white/90 text-xs font-mono">3:12 — Full Setup Walkthrough</span>
+</div>
+</div>
+<p class="text-center text-xs text-ink-faint mt-3">Watch how to go from zero to live in under 3 minutes</p>
+</div>
+</section>
+
+<!-- Steps Container -->
+<section class="pb-20 md:pb-28">
+<div class="max-w-3xl mx-auto px-5 md:px-8 space-y-6">
+
+<!-- STEP 1: A Record -->
+<div class="step-card bg-white border border-canvas-deep rounded-2xl overflow-hidden fade-up fade-up-d4">
+<div class="px-6 md:px-8 py-5 border-b border-canvas-deep flex items-center gap-4">
+<div class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
+<span class="text-white text-sm font-bold">1</span>
+</div>
+<div>
+<h2 class="font-serif text-lg font-bold text-ink">Add an A Record</h2>
+<p class="text-xs text-ink-muted mt-0.5">Point your domain/subdomain to your VPS</p>
+</div>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-5">
+<p class="text-sm text-ink-muted leading-relaxed">Go to your DNS provider (Cloudflare, Namecheap, GoDaddy, etc.) and add an <strong class="text-ink">A record</strong> that points to your VPS IP address.</p>
+
+<!-- DNS Table Example -->
+<div class="rounded-xl border border-canvas-deep overflow-hidden">
+<table class="w-full text-sm">
+<thead><tr class="bg-canvas-alt border-b border-canvas-deep">
+<th class="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-ink-faint">Type</th>
+<th class="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-ink-faint">Name</th>
+<th class="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-ink-faint">Value</th>
+<th class="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-ink-faint">TTL</th>
+</tr></thead>
+<tbody><tr>
+<td class="px-4 py-3 font-mono text-xs font-medium text-brand">A</td>
+<td class="px-4 py-3 font-mono text-xs text-ink">verify</td>
+<td class="px-4 py-3 font-mono text-xs text-ink-muted">Your VPS IP</td>
+<td class="px-4 py-3 font-mono text-xs text-ink-faint">Auto</td>
+</tr></tbody>
+</table>
+</div>
+
+<!-- Warning -->
+<div class="flex items-start gap-3 px-4 py-3.5 bg-amber-50 border border-amber-200 rounded-xl">
+<span class="material-symbols-outlined text-amber-600 text-lg flex-shrink-0 mt-0.5">warning</span>
+<div>
+<p class="text-xs font-semibold text-amber-800">If using Cloudflare — disable the proxy</p>
+<p class="text-xs text-amber-700 mt-0.5">Set the record to <strong>DNS only</strong> (grey cloud). The orange proxy breaks SSL auto-provisioning.</p>
+</div>
+</div>
+
+<p class="text-xs text-ink-faint">DNS propagation takes 2–5 minutes. You can proceed to Step 2 while you wait.</p>
+</div>
+</div>
+
+<!-- STEP 2: Generate Command -->
+<div class="step-card bg-white border border-canvas-deep rounded-2xl overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-canvas-deep flex items-center gap-4">
+<div class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
+<span class="text-white text-sm font-bold">2</span>
+</div>
+<div>
+<h2 class="font-serif text-lg font-bold text-ink">Generate Install Command</h2>
+<p class="text-xs text-ink-muted mt-0.5">Fill in your details and copy the command</p>
+</div>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4">
+
+<!-- Input Fields -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-bold text-ink-muted mb-1.5">License Key</label>
+<input type="text" id="inp-key" placeholder="CM-XXXX-XXXX-XXXX" class="w-full h-11 px-4 text-sm font-mono rounded-xl border border-canvas-deep bg-canvas-alt outline-none focus:border-brand/50 focus:ring-4 focus:ring-brand/5 transition-all placeholder-ink-faint"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-ink-muted mb-1.5">Domain / Subdomain</label>
+<input type="text" id="inp-domain" placeholder="verify.yourdomain.com" class="w-full h-11 px-4 text-sm font-mono rounded-xl border border-canvas-deep bg-canvas-alt outline-none focus:border-brand/50 focus:ring-4 focus:ring-brand/5 transition-all placeholder-ink-faint"/>
+</div>
+</div>
+
+<!-- Generate Button -->
+<button id="btn-generate" class="w-full h-12 bg-ink text-white font-semibold rounded-xl hover:bg-ink-light transition-all shadow-lg shadow-ink/10 text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">terminal</span>
+Generate Install Command
+</button>
+
+<!-- Error Message -->
+<p id="form-error" class="text-xs text-brand font-medium hidden"></p>
+
+<!-- Generated Command Output -->
+<div id="command-output" class="hidden">
+<div class="bg-code-bg rounded-xl p-5 relative group">
+<div class="flex items-center gap-1.5 mb-3">
+<div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+<span class="text-[10px] font-mono text-code-text/30 ml-auto">your-vps</span>
+</div>
+<pre id="command-text" class="font-mono text-xs md:text-[13px] leading-6 text-code-text whitespace-pre-wrap break-all"></pre>
+<button id="btn-copy" class="copy-btn absolute top-4 right-4 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 border border-white/10">
+<span class="material-symbols-outlined text-sm copy-icon">content_copy</span>
+<span class="material-symbols-outlined text-sm check-icon">check</span>
+<span class="copy-label">Copy</span>
+</button>
+</div>
+<p class="text-xs text-ink-muted mt-3 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-ink-faint">info</span>
+Paste this command in your VPS terminal as <strong class="text-ink">root</strong>. The script will ask for your username and password during installation.
+</p>
+</div>
+
+</div>
+</div>
+
+<!-- STEP 3: rDNS -->
+<div class="step-card bg-white border border-canvas-deep rounded-2xl overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-canvas-deep flex items-center gap-4">
+<div class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
+<span class="text-white text-sm font-bold">3</span>
+</div>
+<div>
+<h2 class="font-serif text-lg font-bold text-ink">Set Reverse DNS (rDNS)</h2>
+<p class="text-xs text-ink-muted mt-0.5">Required for accurate SMTP verification</p>
+</div>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-5">
+<p class="text-sm text-ink-muted leading-relaxed">Mail servers check that your IP's reverse DNS matches your domain. Without this, many SMTP checks will fail or be flagged as suspicious.</p>
+
+<div class="bg-canvas-alt border border-canvas-deep rounded-xl p-5 space-y-3">
+<p class="text-xs font-bold text-ink uppercase tracking-wider">How to set it:</p>
+<ol class="list-decimal list-inside space-y-2 text-sm text-ink-muted">
+<li>Go to your <strong class="text-ink">VPS provider's dashboard</strong></li>
+<li>Find <strong class="text-ink">"Reverse DNS"</strong>, "rDNS", or "PTR record"</li>
+<li>Set your IP's rDNS to your domain:<br/>
+<code class="inline-block mt-1 px-2 py-0.5 bg-white border border-canvas-deep rounded font-mono text-xs text-ink">164.92.x.x → verify.yourdomain.com</code></li>
+</ol>
+</div>
+
+<!-- Provider guides -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+<div class="bg-white border border-canvas-deep rounded-xl p-3 text-center">
+<p class="text-xs font-semibold text-ink">Hetzner</p>
+<p class="text-[10px] text-ink-faint mt-0.5">Server → Networking → rDNS</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-3 text-center">
+<p class="text-xs font-semibold text-ink">DigitalOcean</p>
+<p class="text-[10px] text-ink-faint mt-0.5">Droplet name = rDNS</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-3 text-center">
+<p class="text-xs font-semibold text-ink">Contabo</p>
+<p class="text-[10px] text-ink-faint mt-0.5">VPS Control → rDNS</p>
+</div>
+<div class="bg-white border border-canvas-deep rounded-xl p-3 text-center">
+<p class="text-xs font-semibold text-ink">Vultr</p>
+<p class="text-[10px] text-ink-faint mt-0.5">Settings → Reverse DNS</p>
+</div>
+</div>
+
+<p class="text-xs text-ink-faint flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">schedule</span>
+rDNS changes propagate in 5–30 minutes. Your app works immediately — rDNS improves SMTP accuracy later.
+</p>
+</div>
+</div>
+
+<!-- Success Banner -->
+<div class="bg-green-50 border border-green-200 rounded-2xl p-6 md:p-8 text-center">
+<div class="w-12 h-12 rounded-full bg-green-100 border border-green-200 flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-green-600 text-2xl" style="font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+<h3 class="font-serif text-xl font-bold text-ink mb-2">That's it!</h3>
+<p class="text-sm text-ink-muted max-w-md mx-auto leading-relaxed">Once the install script finishes, your CleanMails dashboard will be live at your domain with automatic SSL. Log in with the username and password you set during installation.</p>
+<div class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white border border-green-200 rounded-full">
+<span class="w-2 h-2 bg-green-500 rounded-full"></span>
+<span class="text-xs font-mono font-medium text-ink">https://verify.yourdomain.com</span>
+</div>
+</div>
+
+<!-- Help -->
+<div class="text-center pt-4">
+<p class="text-sm text-ink-muted">Stuck? Email <a href="mailto:hello@cleanmails.online" class="text-brand hover:underline font-medium">hello@cleanmails.online</a> and we'll help you get set up.</p>
+</div>
+
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-ink text-white py-12">
+<div class="max-w-7xl mx-auto px-5 md:px-8">
+<div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 bg-brand rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings:'FILL' 1">mail</span>
+</div>
+<span class="font-serif font-bold text-lg">CleanMails</span>
+</div>
+<div class="flex items-center gap-6">
+<a href="privacy.html" class="text-xs text-white/50 hover:text-white transition-colors">Privacy</a>
+<a href="terms.html" class="text-xs text-white/50 hover:text-white transition-colors">Terms</a>
+<a href="mailto:hello@cleanmails.online" class="text-xs text-white/50 hover:text-white transition-colors">Contact</a>
+</div>
+<span class="text-white/30 text-xs">© 2024 CleanMails</span>
+</div>
+</div>
+</footer>
+
+<script>
+// Pre-fill license key from URL params (Dodo redirects with ?license_key=XXX)
+const params = new URLSearchParams(window.location.search);
+const prefillKey = params.get('license_key') || params.get('key') || '';
+if (prefillKey) {
+  document.getElementById('inp-key').value = prefillKey;
+}
+
+// Generate command
+document.getElementById('btn-generate').addEventListener('click', function() {
+  const key = document.getElementById('inp-key').value.trim();
+  const domain = document.getElementById('inp-domain').value.trim();
+  const errorEl = document.getElementById('form-error');
+  const outputEl = document.getElementById('command-output');
+
+  // Validation
+  errorEl.classList.add('hidden');
+  errorEl.textContent = '';
+
+  if (!key) { showError('License key is required.'); return; }
+  if (!domain || !domain.includes('.')) { showError('Enter a valid domain (e.g., verify.example.com).'); return; }
+
+  // Build command
+  const cmd = `curl -sSL https://cleanmails.online/install.sh | bash -s -- --key=${key} --domain=${domain}`;
+
+  document.getElementById('command-text').textContent = cmd;
+  outputEl.classList.remove('hidden');
+  outputEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.remove('hidden');
+  }
+});
+
+// Copy to clipboard
+document.getElementById('btn-copy').addEventListener('click', function() {
+  const text = document.getElementById('command-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.classList.add('copied');
+    btn.querySelector('.copy-label').textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.querySelector('.copy-label').textContent = 'Copy';
+    }, 2500);
+  });
+});
+
+// Video placeholder click — replace with embed when you have the URL
+document.getElementById('video-container').addEventListener('click', function() {
+  // Replace the placeholder URL below with your actual video embed
+  // Example for YouTube: https://www.youtube.com/embed/VIDEO_ID?autoplay=1
+  // Example for Loom: https://www.loom.com/embed/VIDEO_ID?autoplay=1
+  const videoURL = ''; // ← ADD YOUR VIDEO URL HERE
+  if (videoURL) {
+    this.innerHTML = '<iframe src="' + videoURL + '" class="absolute inset-0 w-full h-full" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+  }
+});
+</script>
+
+</body>
+</html>
