@@ -119,7 +119,7 @@ Replace monthly verification bills with a one-time purchase. Verify unlimited em
 <!-- CTA -->
 <div class="flex flex-col sm:flex-row gap-3 justify-center">
 <a href="#pricing" class="px-8 py-3.5 bg-brand text-white font-medium rounded-full hover:bg-brand-dark transition-all shadow-lg shadow-brand/20 text-center">Buy Lifetime Access — $139</a>
-<a href="demo.html" class="px-8 py-3.5 bg-white text-ink font-medium rounded-full border border-canvas-deep hover:border-ink-faint transition-all text-center">Try Live Demo</a>
+<a href="https://verify.taftlivingph.com/" target="_blank" class="px-8 py-3.5 bg-white text-ink font-medium rounded-full border border-canvas-deep hover:border-ink-faint transition-all text-center">Try Live Demo</a>
 </div>
 <p class="text-xs text-ink-faint mt-3 mb-10">Built for agencies, newsletter operators and SaaS teams validating email at scale.</p>
 
@@ -474,43 +474,6 @@ Replace monthly verification bills with a one-time purchase. Verify unlimited em
 <p class="text-[11px] text-code-text/50 font-mono">That's it. Your AI can now verify emails.</p>
 </div>
 </div>
-</div>
-</div>
-</section>
-
-<!-- Live Demo -->
-<section class="py-16 md:py-24 bg-canvas-alt">
-<div class="max-w-4xl mx-auto px-5 md:px-8">
-<div class="text-center mb-10">
-<p class="text-xs font-mono text-brand uppercase tracking-widest mb-3">Try It</p>
-<h2 class="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight">Test it right now.</h2>
-<p class="text-ink-muted mt-3 text-base max-w-lg mx-auto">Enter any email below — this runs against our live demo instance.</p>
-</div>
-
-<div class="bg-white border border-canvas-deep rounded-2xl p-6 md:p-8 shadow-sm">
-<form id="demo-form" class="flex gap-3 mb-6">
-<input id="demo-email" type="email" required placeholder="someone@example.com" class="flex-1 h-12 px-5 text-[15px] rounded-xl border border-canvas-deep bg-canvas-alt outline-none transition-all focus:border-brand/50 focus:ring-4 focus:ring-brand/10 font-mono"/>
-<button type="submit" id="demo-btn" class="h-12 px-7 bg-ink text-white text-sm font-bold rounded-xl hover:bg-ink-light transition-all shadow-lg shadow-ink/10">Verify</button>
-</form>
-<div id="demo-result" class="hidden">
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Status</p><p id="dr-status" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Score</p><p id="dr-score" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">MX</p><p id="dr-mx" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Disposable</p><p id="dr-disp" class="text-sm font-bold mt-0.5">—</p></div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Free</p><p id="dr-free" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Role</p><p id="dr-role" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Catch-All</p><p id="dr-catch" class="text-sm font-bold mt-0.5">—</p></div>
-<div class="rounded-xl border border-canvas-deep p-3 text-center"><p class="text-[10px] font-mono text-ink-faint uppercase tracking-wider">Suggestion</p><p id="dr-suggest" class="text-sm font-bold mt-0.5">—</p></div>
-</div>
-</div>
-<div id="demo-loading" class="hidden text-center py-6">
-<div class="inline-block w-5 h-5 border-2 border-brand/30 border-t-brand rounded-full animate-spin"></div>
-<p class="text-xs text-ink-muted mt-2">Verifying...</p>
-</div>
-<p id="demo-error" class="hidden text-sm text-red-500 text-center mt-4"></p>
 </div>
 </div>
 </section>
@@ -1079,60 +1042,6 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-// Live Demo
-const demoForm = document.getElementById('demo-form');
-const demoEmail = document.getElementById('demo-email');
-const demoResult = document.getElementById('demo-result');
-const demoLoading = document.getElementById('demo-loading');
-const demoError = document.getElementById('demo-error');
-const demoBtn = document.getElementById('demo-btn');
-
-if (demoForm) {
-  demoForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = demoEmail.value.trim();
-    if (!email) return;
-
-    demoResult.classList.add('hidden');
-    demoError.classList.add('hidden');
-    demoLoading.classList.remove('hidden');
-    demoBtn.disabled = true;
-    demoBtn.textContent = 'Checking...';
-
-    try {
-      const res = await fetch('https://verify.taftlivingph.com/api/v1/verify/single', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': 'demo_public_readonly' },
-        body: JSON.stringify({ email, depth: 'full' }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || 'Verification failed');
-
-      const r = data.result || {};
-      document.getElementById('dr-status').textContent = data.status || '—';
-      document.getElementById('dr-status').className = 'text-sm font-bold mt-0.5 ' + (data.status === 'valid' ? 'text-green-600' : data.status === 'risky' ? 'text-amber-600' : 'text-red-600');
-      document.getElementById('dr-score').textContent = (data.score || 0) + '/100';
-      document.getElementById('dr-mx').textContent = r.has_mx_records ? '✓ Found' : '✗ None';
-      document.getElementById('dr-mx').className = 'text-sm font-bold mt-0.5 ' + (r.has_mx_records ? 'text-green-600' : 'text-red-600');
-      document.getElementById('dr-disp').textContent = r.disposable ? 'Yes ⚠️' : 'No';
-      document.getElementById('dr-disp').className = 'text-sm font-bold mt-0.5 ' + (r.disposable ? 'text-red-600' : 'text-green-600');
-      document.getElementById('dr-free').textContent = r.free ? 'Yes' : 'No';
-      document.getElementById('dr-role').textContent = r.role_account ? 'Yes' : 'No';
-      document.getElementById('dr-catch').textContent = r.catch_all ? 'Yes' : 'No';
-      document.getElementById('dr-suggest').textContent = r.suggestion || '—';
-
-      demoResult.classList.remove('hidden');
-    } catch (err) {
-      demoError.textContent = err.message || 'Something went wrong';
-      demoError.classList.remove('hidden');
-    } finally {
-      demoLoading.classList.add('hidden');
-      demoBtn.disabled = false;
-      demoBtn.textContent = 'Verify';
-    }
-  });
-}
 </script>
 
 </body>
